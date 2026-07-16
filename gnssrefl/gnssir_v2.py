@@ -284,12 +284,30 @@ def read_json_file(station, extension='',**kwargs):
             print('Please make with gnssir_input and run this code again.')
             sys.exit()
 
-    if len(station_config['reqAmp']) < len(station_config['freqs']) :
-        print('Number of frequencies found in json: ', len(station_config['freqs']))
-        print('Number of required amplitudes found in json: ', len(station_config['reqAmp']))
-        print('You need to have a required Amplitude for each frequency.')
-        print('Please fix your json file: ', json_path)
-        sys.exit()
+    # reqAmp is parallel to freqs: reqAmp[i] is the required amplitude for freqs[i].
+    # A hand-edited or stale json can desync them. Warn loudly and normalize instead of crashing.
+    freqs = station_config['freqs']
+    reqAmp = station_config['reqAmp']
+    if not isinstance(reqAmp, list):
+        reqAmp = [reqAmp]  # tolerate a hand-edited scalar
+    nfreq = len(freqs)
+    if len(reqAmp) != nfreq:
+        fullpath = os.path.abspath(json_path)
+        pad = reqAmp[0] if reqAmp else 6.0
+        print('*********************************************************************')
+        print('WARNING: your reqAmp list does not match your freqs list.')
+        print(f'  freqs has {nfreq} frequencies; reqAmp has {len(reqAmp)} values.')
+        if len(reqAmp) > nfreq:
+            print(f'  Ignoring the last {len(reqAmp) - nfreq} extra reqAmp value(s) for this run.')
+        else:
+            print(f'  Filling the {nfreq - len(reqAmp)} missing value(s) with {pad} (the first reqAmp value) for this run.')
+        print('  reqAmp must have exactly one required amplitude per frequency.')
+        print('  To fix this permanently, do ONE of the following:')
+        print(f'    1. edit {fullpath} so reqAmp lists {nfreq} values (one per frequency), or')
+        print('    2. regenerate the file with gnssir_input, or')
+        print('    3. pass -ampl <value(s)> on the command line to set it just for this run.')
+        print('*********************************************************************')
+        station_config['reqAmp'] = (reqAmp + [pad] * nfreq)[:nfreq]
 
     return station_config
 

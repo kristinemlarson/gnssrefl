@@ -13,7 +13,7 @@ import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as guts2
 import gnssrefl.phase_functions as qp
 from gnssrefl.tracks import warn_legacy_apriori_and_exit
-from gnssrefl.utils import FileManagement, str2bool
+from gnssrefl.utils import FileManagement, str2bool, expand_amplitudes
 
 
 def parse_arguments():
@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument("-gzip", default=None, type=str, help="gzip SNR files after use, default is True" )
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
     parser.add_argument("-midnite", default=None, type=str, help="load adjacent day data for midnight-crossing arcs (default is true)")
-    parser.add_argument("-ampl", default=None, type=float, help="Min spectral amplitude")
+    parser.add_argument("-ampl", default=None, nargs="*", type=float, help="Min spectral amplitude(s) for this run: one value or one per -fr frequency.")
     parser.add_argument("-savearcs", default=None, type=str, help="save individual arcs, default is False")
     parser.add_argument("-savearcs_format", default=None, type=str, help="format of saved arcs (txt or pickle), default is txt")
     parser.add_argument("-dec", default=None, type=int, help="decimate SNR data to this sampling rate")
@@ -207,7 +207,8 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     if e2 is not None:
         station_config['e2'] = e2
     if ampl is not None:
-        station_config['reqAmp'] = [ampl]
+        station_config['freqs'] = fr_list          # align the QC index with the frequencies processed
+        station_config['reqAmp'] = expand_amplitudes(ampl, fr_list)   # per-run only; not written to json
     station_config['screenstats'] = screenstats
     station_config['midnite'] = midnite
     if gzip is not None:

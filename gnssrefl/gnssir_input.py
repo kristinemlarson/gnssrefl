@@ -8,7 +8,7 @@ import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as guts2
 from gnssrefl.gnss_frequencies import gps_default_frequencies, all_default_frequencies
 
-from gnssrefl.utils import str2bool, FileManagement, FileTypes
+from gnssrefl.utils import str2bool, FileManagement, FileTypes, expand_amplitudes
 
 
 def parse_arguments():
@@ -26,7 +26,7 @@ def parse_arguments():
     parser.add_argument("-nr1",default=None, type=float, help="Lower limit RH used for noise region in QC(m)")
     parser.add_argument("-nr2",default=None, type=float, help="Upper limit RH used for noise region in QC(m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="peak to noise ratio used for QC")
-    parser.add_argument("-ampl", default=None, type=float, help="Required spectral peak amplitude for QC")
+    parser.add_argument("-ampl", default=None, nargs="*", type=float, help="Required spectral peak amplitude(s): one value, or one per frequency (matching -frlist).")
     parser.add_argument("-allfreq", default=None, type=str, help="Set to T to include all GNSS signals")
     parser.add_argument("-l1", default=None, type=str, help="Set to T to use only GPS L1")
     parser.add_argument("-l2c", default=None, type=str, help="Set to T to only use GPS L2C")
@@ -207,9 +207,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         peak to noise ratio used for QC.
         default is 2.7 (just a starting point for water - should be 3 or 3.5 for snow or soil...)
 
-    ampl : float, optional
-        spectral peak amplitude for QC. default is 6.0
-        this is receiver and elevation angle region dependent - so you need to change it based on your site 
+    ampl : float or list of floats, one per frequency, optional
+        spectral peak amplitude for QC. default is 5.0
+        this is receiver and elevation angle region dependent - so you need to change it based on your site
 
     allfreq : bool, optional
         True requests all GNSS frequencies.
@@ -388,8 +388,6 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         apriori_rh = 5 # completely made up, meters
 
 # start the station_config dictionary
-    reqA = ampl
-
     station_config = {}
     station_config['station'] = station.lower()
     station_config['lat'] = lat
@@ -501,9 +499,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         print('Implementing user-provided frequency list.')
         station_config['freqs'] = frlist
 
-    # create a list with all values equal to reqA
-    # but the length of the list depends on the length of the list of frequencies
-    station_config['reqAmp'] = [reqA]*len(station_config['freqs'])
+    # one required amplitude per frequency; a single -ampl value expands to all, a list is used positionally
+    amps = expand_amplitudes(ampl, station_config['freqs'])
+    station_config['reqAmp'] = amps if amps is not None else [5.0] * len(station_config['freqs'])
 
     # this is true or false.  I think
     station_config['refraction'] = refraction
