@@ -15,7 +15,7 @@ import gnssrefl.gnssir_v2 as guts2
 import gnssrefl.gps as g
 import gnssrefl.refraction as refr
 
-from gnssrefl.utils import str2bool
+from gnssrefl.utils import str2bool, expand_amplitudes
 
 
 def parse_arguments():
@@ -30,7 +30,7 @@ def parse_arguments():
     parser.add_argument("-snr", default=None, help="snr file ending, default is 66", type=int)
     parser.add_argument("-plt", default=None, help="plt to screen (True or False)", type=str)
     parser.add_argument("-fr", default=None, nargs="*",type=int, help="Frequency override for json, e.g. 1 101 for GPS and Glonass L1")
-    parser.add_argument("-ampl", default=None, type=float, help="Min spectral amplitude ")
+    parser.add_argument("-ampl", default=None, nargs="*", type=float, help="Min spectral amplitude(s) for this run: one value or one per -fr frequency.")
     parser.add_argument("-sat", default=None, type=int, help="Only look at this satellite")
     parser.add_argument("-doy_end", default=None, type=int, help="doy end")
     parser.add_argument("-year_end", default=None, type=int, help="year end")
@@ -340,17 +340,20 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # rather than using the input restrictions
 
     if len(fr) > 0:
+        original_freqs = station_config['freqs']
+        original_reqAmp = station_config['reqAmp']
+        missing = [f for f in fr if f not in original_freqs]
         station_config['freqs'] = fr
-        # better make sure you have enough amplitudes
-        ampl_from_json = station_config['reqAmp'][0]
         if ampl is None:
-            station_config['reqAmp'] = [ampl_from_json for i in range(14)]
+            if missing:
+                print(f'Note: -fr requested {missing}, not in your json, so no reqAmp is listed for them.')
+                print(f'  Using the json default {original_reqAmp[0]} for those; pass -ampl to set it yourself.')
+            # keep each in-json frequency's configured threshold; missing frequencies fall back to the first value
+            station_config['reqAmp'] = [original_reqAmp[original_freqs.index(f)] if f in original_freqs else original_reqAmp[0] for f in fr]
 
-    if ampl is not None:
-        # this is not elegant - but allows people to set ampl on the command line
-        # but use the frequency list from their json ...  which i think has max of 12
-        # but use 14 to be sure
-        station_config['reqAmp'] = [ampl for i in range(14)]
+    amps = expand_amplitudes(ampl, station_config['freqs'])
+    if amps is not None:
+        station_config['reqAmp'] = amps   # per-run only; never written to the json
 
     if sat is not None:
         station_config['onesat'] = [sat]

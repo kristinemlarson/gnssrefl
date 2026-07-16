@@ -31,18 +31,7 @@
         20 
     ],
     "reqAmp": [
-        8,
-        6,
-        6,
-        6,
-        6,
-        6,
-        6,
-        6,
-        6,
-        6,
-        6,
-        6
+        8
     ],
     "refraction": true,
     "overwriteResults": true,

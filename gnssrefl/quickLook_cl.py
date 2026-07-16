@@ -183,11 +183,11 @@ def quicklook(station: str, year: int, doy: int,
 
     # set some reasonable default values for LSP (Reflector Height calculation).
     # most of these can be overriden at the command line
-    if fr is not type(list):
+    if not isinstance(fr, list):
         fr = [fr]  # default is to do L1
 
     pele = [5, 30]  # polynomial fit limits
-    if ampl is not type(list):
+    if not isinstance(ampl, list):
         ampl = [ampl]  # this is arbitrary  - but often true for L1 obs
 
     if e1 < 5:

@@ -3,6 +3,7 @@ import numpy as np
 import os
 import platform
 import subprocess
+import sys
 import warnings
 
 from enum import Enum
@@ -666,6 +667,28 @@ def pre_check_arc(meta, station_config):
         return False, 'delT'
 
     return True, None
+
+
+def expand_amplitudes(ampl, freqs):
+    """Expand a -ampl command-line value to one required amplitude per frequency.
+
+    ampl is what argparse gives for -ampl with nargs='*': None, a scalar, or a list.
+      None            -> None (caller keeps the json value / default)
+      one value       -> that value broadcast to every frequency
+      len == freqs    -> used positionally, one per frequency
+      any other count -> print an error and exit (the user can retry the command)
+    """
+    if ampl is None:
+        return None
+    if not isinstance(ampl, list):
+        ampl = [ampl]
+    if len(ampl) == 1:
+        return ampl * len(freqs)
+    if len(ampl) == len(freqs):
+        return list(ampl)
+    print('ERROR: the number of -ampl values must be 1 or match the number of frequencies.')
+    print(f'  you gave {len(ampl)} amplitude(s) for {len(freqs)} frequency(ies): {freqs}')
+    sys.exit()
 
 
 def check_arc_quality(meta, peak_rh, max_amp, noise, station_config):
