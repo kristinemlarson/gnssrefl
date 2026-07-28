@@ -1,8 +1,10 @@
-# gnssrefl v4.1.5
+# gnssrefl v4.2.0
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 
 **News**
+
+* fixed a bug in the docker release.
 
 gnssrefl releases from v4.0.0+ are focused on modernizing the package code to improve maintainability, 
 consistency, and performance (up to 5x faster).  Specifically, changes since v3.19.2 (17th Feb 2026) 

@@ -245,7 +245,7 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     # this is not working, so just setting it to false, cause who cares!
     setlimits = False
     fs = 10
-    fig,(ax2,ax3)=plt.subplots(2,1,sharex=True)
+    fig,(ax2,ax3)=plt.subplots(2,1,sharex=True,figsize=(10, 10))
         # put some azimuth information on it
     colors = tv[:,5]
         # ax.plot( otimes, tv[:,2], '.')

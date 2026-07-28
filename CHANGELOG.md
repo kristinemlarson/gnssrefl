@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 4.2.0
+
+July 28, 2026
+
+New version includes a few recent pull requests.
+
+[Fixed docker issues](https://github.com/kristinemlarson/gnssrefl/pull/419)
+
+[Improved frequency/amplitude inputs in json](https://github.com/kristinemlarson/gnssrefl/pull/421)
+
+[Clear Node 20 warnings](https://github.com/kristinemlarson/gnssrefl/pull/420)
+
+## 4.1.6
+
+[update GFZ links](https://github.com/kristinemlarson/gnssrefl/pull/416)
+
+
 ## 4.1.5
 
 April 30, 2026 
