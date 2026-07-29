@@ -109,7 +109,11 @@ def main():
         year = rinex3[12:16]
         cdoy = rinex3[16:19] 
         idoy = int(cdoy)
+        srate = int(rinex3[28:30] )
+        stream = rinex3[10:11] 
 
+
+    #print(srate, stream)
     #print(station, STATION, year, cdoy)
     # all lowercase in my world
     rinex2 = station + cdoy + '0.' + year[2:4] + 'o'
@@ -132,8 +136,12 @@ def main():
         station9ch = rinex3[0:9]
         archive = 'unavco'
         rate = 'low'; nol = True
-        overwrite = False; srate = 30; mk = False
-        strip = False; stream = 'R'; bkg = 'IGS'
+        overwrite = False; 
+        #srate = 30; 
+        #stream = 'R'; 
+        mk = False
+        strip = False; 
+        bkg = 'IGS'
         gzip = True; timeout = 0; screenstats = True
         r.run_rinex2snr(station9ch, iyear, idoy, isnr, orbtype, rate,dec_rate,archive,nol,
                 overwrite,srate,mk,stream,strip,bkg,screenstats,gzip,timeout,quiet)

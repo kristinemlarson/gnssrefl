@@ -221,22 +221,33 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                         #    csrate = '01' # high rate assumes 1-sec
                         #else:
                         csrate = '{:02d}'.format(srate)
-                        print(csrate)
+                        #print(csrate)
                         streamid = '_' + stream  + '_'
+                        #print('rate and stream ID ', csrate, streamid)
                         # this can be done in a function now ...
                         r3cmpgz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.crx.gz'
+                        # good god - someone should clean this up
+                        r3cmp = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.crx'
                         r3 = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
                         r3gz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx.gz'
                         r2 = station + cdoy + '0.' + cyy + 'o'
-                        if os.path.exists(r3cmpgz):
+                        if os.path.exists(r3cmp):
+                            log.write('Trying to translate  {0:s} \n'.format(r3cmp))
+                            #print('found crx ', r3cmp)
+                            deletecrx = True
+                            translated, rnx_filename = go_from_crx_to_rnx(r3cmp,deletecrx)
+                        elif os.path.exists(r3cmpgz):
                             log.write('Trying to translate  {0:s} \n'.format(r3cmpgz))
+                            #print('found crx and gz', r3cmpgz)
                             deletecrx = True
                             translated, rnx_filename = go_from_crxgz_to_rnx(r3cmpgz,deletecrx)
                         if os.path.exists(r3gz):
                             log.write('Trying to gunzip {0:s} \n'.format( r3gz))
+                            #print('found rnx and gz', r3gz)
                             subprocess.call(['gunzip', r3gz])
                         # have not found the rinex 3 file
                         if not os.path.exists(r3):
+                            print('now looking in the rinex directories, but not all versions ... sigh ')
                             local_rinex3_dir  = xdir + '/' + cyyyy + '/rinex/' + station + '/'
                             log.write('Trying  to look for RINEX 3 file in {0:s} \n'.format( local_rinex3_dir))
                             lrinex3 = local_rinex3_dir+r3
@@ -1287,6 +1298,47 @@ def makan_warning(missing, f):
 
     return
 
+def go_from_crx_to_rnx(crx,deletecrx=True):
+    """
+    checks to see if crx rinex3 file exists, 
+
+    Parameters
+    ----------
+    crx : str
+        filename for a RINEX 3 Hatanaka file
+
+    deletecrx = bool
+        whether to delete the crx file
+
+    Returns
+    -------
+    translated : bool
+        if file successfully found and available
+
+    rnx : str
+        name of gunzipped and decompressed RINEX 3
+
+    """
+    # this code and the one below it should be made less stupid! But i 
+    # don't have time for it.
+    translated = False # assume failure
+    rnx = crx.replace('crx','rnx') # rnx filename
+    # gunzip
+
+    # executable
+    crnxpath = g.hatanaka_version()
+    if not os.path.exists(crnxpath):
+        g.hatanaka_warning()
+    else:
+        if os.path.exists(crx): # file exists
+            subprocess.call([crnxpath,crx])
+    if os.path.exists(rnx): # file exists
+        translated = True
+        if deletecrx:
+            #print('remove Hatanaka compressed file')
+            subprocess.call(['rm','-f',crx])
+
+    return translated, rnx
 def go_from_crxgz_to_rnx(c3gz,deletecrx=True):
     """
     checks to see if rinex3 file exists, gunzip if necessary,
@@ -1309,6 +1361,7 @@ def go_from_crxgz_to_rnx(c3gz,deletecrx=True):
         name of gunzipped and decompressed RINEX 3
 
     """
+    # this should be made less stupid! But i don't have time for it.
     translated = False # assume failure
     c3 = c3gz[:-3] # crx filename
     rnx = c3.replace('crx','rnx') # rnx filename

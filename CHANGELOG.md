@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 4.2.1
+
+Fixing bug in rinex3_snr - was not properly finding crx files in your own directory
+
+
 ## 4.2.0
 
 July 28, 2026
