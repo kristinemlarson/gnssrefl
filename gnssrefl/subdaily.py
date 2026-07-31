@@ -370,7 +370,11 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     tv,t,rh,mjd1,mjd2= apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,year, d1,d2,h1,h2,freqs)
 
     nr,nc = tv.shape
-    print('RH retrievals after all commandline constraints', nr)
+    print('Number of RH retrievals after all commandline constraints', nr)
+    if nr == 0:
+        print('Something is very odd. Perhaps your json file does not exist. exiting.')
+        sys.exit()
+
 
     #  create obstimes from MJD records
     otimes = sd.mjd_to_obstimes(tv[:,15])

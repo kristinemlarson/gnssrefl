@@ -259,6 +259,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     station_config = sd.pickup_subdaily_json_defaults(xdir, station, extension)
     if 'freqs' in station_config:
         fr = station_config['freqs']
+    else:
+        fr = [] # ? otherwise it is crashing
 
     if subdir is None: # not set on the command line
         if station_config['subdaily_subdir'] is None:

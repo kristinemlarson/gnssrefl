@@ -84,6 +84,7 @@ def retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats
 
         for arc_number, (meta, data) in enumerate(freq_arcs):
             arc_passed = False
+
             try:
                 # Map extract_arcs output to expected variables
                 satNu = meta['sat']

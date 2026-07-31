@@ -506,6 +506,7 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid,dbhz,*
     """
     fundy = kwargs.get('fundy',False)
 
+    #print(satNu)
     #print('Using polyfit ', pfitV)
     x=[]; y=[]; azi=[]; seconds = []; edot = [] ; sat = []
     Nvv= 0; meanTime = 0; avgAzim = 0 ; outFact2 = 0 ; delT = 0
