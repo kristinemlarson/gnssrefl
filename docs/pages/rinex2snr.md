@@ -39,6 +39,9 @@ or in $REFL_CODE/2020/rinex/p041
 
 <code>rinex2snr p041 2020 132 -nolook T</code>
 
+Note that -nolook decompresses and deletes the RINEX file it finds; use -input_file if you want your 
+original left alone.
+
 If you want to specify a non-default archive:
 
 <code>rinex2snr tgho 2020 132 -archive nz</code>
@@ -70,6 +73,28 @@ Other examples:
 
 <code>rinex2snr mchl00aus 2022 55 -archive ga</code>
 
+
+**Translating a file you already have**
+
+If your RINEX file is not where the code expects it to be, or is not named the way the code 
+expects it to be named, hand it over directly:
+
+<code>rinex2snr -input_file /home/data/MCHL00AUS_R_20220550000_01D_30S_MO.crx.gz</code>
+
+The station, year, and day of year are read from the filename. If the filename is not a standard
+RINEX 2.11 or RINEX 3 name, we attempt to read them from the file header instead. Both RINEX 2.11 and RINEX 3 files are allowed, as are gzipped, 
+unix compressed, and Hatanaka compressed ones. The original files are not modified or deleted.
+
+You can supply missing information yourself:
+
+<code>rinex2snr mchl 2022 55 -input_file /home/data/whatever_this_is.gz</code>
+
+To do a whole folder at once:
+
+<code>rinex2snr -input_folder /home/data -orb gnss</code>
+
+Anything in there that is not RINEX is skipped and reported at the start. Subdirectories are not searched, 
+and station, year, and day of year must be in the file (there is no command line doy/year input for folders).
 
 **Frequently asked questions**
 
