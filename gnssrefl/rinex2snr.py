@@ -52,7 +52,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     return fname
 
 def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol,overwrite,srate,
-                  mk, stream,strip,bkg,screenstats,gzip,timeout,quiet):
+                  mk, stream,strip,bkg,screenstats,gzip,timeout):
     """
     main code to convert RINEX files into SNR files.
     It works on a single year and doy.
@@ -103,12 +103,9 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
     timeout : int
         optional parameter I am testing out for requests timeout parameter
         in seconds
-    quiet : bool
-        whether gfzrnx messages are printed to the screen (T) or suppressed (F)
 
     """
     #
-    #print('quiet option ', quiet)
     xdir = os.environ['REFL_CODE']
     gpsonly = False
 
