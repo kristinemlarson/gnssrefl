@@ -498,6 +498,14 @@ def extract_arcs_from_station(
         print(f'No usable SNR data for {station} {year} {doy}, skipping')
         return []
 
+    # testing, KL, allow removal of GEO Beidou , testing on ALTG data ...
+    if 'exclude_satellites' in station_config:
+        satlist = station_config['exclude_satellites']
+        if len(satlist) > 0:
+            for sat in satlist:
+                j= (snr_array[:,0] == sat)
+                snr_array = np.delete(snr_array, j, axis=0)
+
     # Apply refraction correction
     if station_config is not None and station_config.get('refraction', False):
         snr_array = apply_refraction(snr_array, station_config, year, doy, verbose=refraction_verbose)
