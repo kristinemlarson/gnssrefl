@@ -29,9 +29,11 @@ def parse_arguments():
     g.print_version_to_screen()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("station", help="station name", type=str)
-    parser.add_argument("year", help="year", type=int)
-    parser.add_argument("doy", help="start day of year", type=int)
+    parser.add_argument("station", nargs='?', default=None, help="station name", type=str)
+    parser.add_argument("year", nargs='?', default=None, help="year", type=int)
+    parser.add_argument("doy", nargs='?', default=None, help="start day of year", type=int)
+    parser.add_argument("-input_file", default=None, type=str, help="translate this RINEX file. RINEX 2.11 and RINEX 3 filenames are understood, as are gzipped, unix compressed, and Hatanaka compressed files")
+    parser.add_argument("-input_folder", default=None, type=str, help="translate every RINEX file in this folder")
     parser.add_argument("-snr", default=None, help="snr file ending, Default is 66: < 30 deg, other values 99: 5-30 deg.; 88: all data; 50: < 10 deg." )
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, e.g. gps, gps+glo, gnss, rapid, ultra, gnss3")
@@ -55,24 +57,24 @@ def parse_arguments():
     parser.add_argument("-timeout", default=None, help="timeout in secs, useful for some archives", type=int)
     parser.add_argument("-extension", default=None, help="optional extension to keep information like samplerate, snr, lat, lon etc", type=str)
     parser.add_argument("-debug", default=None, help="run without task queue", type=str)
-    parser.add_argument("-quiet", default=None, help="gfzrnx output sent to the screen (default is True)", type=str)
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['nolook', 'overwrite', 'mk', 'weekly','strip','screenstats','gzip','monthly','debug','quiet']
+    boolean_args = ['nolook', 'overwrite', 'mk', 'weekly','strip','screenstats','gzip','monthly','debug']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
 
-def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = None, rate: str = 'low', dec: int = 0,
+def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str = None, orb: str = None, rate: str = 'low', dec: int = 0,
               nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False,
               screenstats : bool = False, gzip : bool = True, monthly : bool = False,
-              par : int=None, timeout : int = 0, extension : str='', debug: bool = False, quiet: bool = True):
+              par : int=None, timeout : int = 0, extension : str='', debug: bool = False,
+              input_file : str = None, input_folder : str = None):
     """
     Note: rinex2snr means rinex TO snr. It is not a tool that is only meant for version 2 rinex files.
 
@@ -123,6 +125,16 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     Beyond that, you can try the -mk T option which searches other places, i.e. $REFL_CODE/rinex/ etc. I do not recommend
     that you use this option, but it is there.  In general, you should use lowercase file names for RINEX 2.11 files.
 
+
+    If your file is somewhere else, or is not named the way the code expects, hand it over directly with
+    -input_file. The station, year, and day of year are read from the filename. If the filename is not a
+    standard RINEX 2.11 or RINEX 3 name, we attempt to read them from the file header instead, and you can
+    supply them yourself if the file has neither. Gzipped, unix compressed, and Hatanaka compressed files
+    are allowed. Your file is copied first, so the original is not modified or deleted.
+
+    Use -input_folder to do a whole folder at once. Anything in there that is not RINEX is skipped and
+    reported at the start, subdirectories are not searched, and station, year, and day of year must be in
+    the files, as every one of them has its own.
 
     If you have a RINEX3 file, you have to use the same naming convention as used by GNSS archive facilities.
     This means everything is capitalized except for the ending. The station name has 9 characters and various other 
@@ -206,6 +218,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
 
     rinex2snr tgho  2019 1 -doy_end 365 -archive nz
         example for multiday SNR file creation
+
+    rinex2snr -input_file /home/data/MCHL00AUS_R_20220150000_01D_30S_MO.crx.gz
+        translates the RINEX file you point at. Station, year, and day of year come from the file
+
+    rinex2snr -input_folder /home/data -orb gnss
+        translates every RINEX file in that folder, all of them using GFZ final orbits
 
     Parameters
     ----------
@@ -386,8 +404,18 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     debug : bool, optional
         run without task queue - important for debugging.
 
-    quiet: bool, optional
-        run gfzrnx for RINEX 3 files but suppress the screen output (default is True)
+    input_file : str, optional
+        RINEX 2.11 or RINEX 3 observation file to translate, at any path and under any name.
+        The station, year, and day of year are read from the filename or the file header unless
+        you give them on the command line. Gzipped, unix compressed, and Hatanaka compressed
+        files are allowed.
+
+    input_folder : str, optional
+        folder of RINEX 2.11 or RINEX 3 observation files, all of which are translated. Each file
+        is identified on its own, so the folder may hold more than one station and more than one
+        day. Files that are not RINEX are skipped, and subdirectories are not searched. Station,
+        year, and day of year cannot be given on the command line with this option. Set par to
+        translate more than one file at a time.
 
     """
 
@@ -412,6 +440,42 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     # make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE']
+
+    if (input_file is not None) and (input_folder is not None):
+        print('Please use either input_file or input_folder, not both. Exiting')
+        return
+
+    if input_folder is not None:
+        if not os.path.isdir(input_folder):
+            print('ERROR: your input folder does not exist: ', input_folder)
+            return
+        if (station is not None) or (year is not None) or (doy is not None):
+            print('Station, year, and day of year cannot be used with input_folder, as every file in it has its own.')
+            return
+        translate_folder(input_folder, snr, orb, dec, overwrite, gzip, extension, par if par else 1)
+        return
+
+    if input_file is not None:
+        if os.path.isdir(input_file):
+            print('ERROR: that is a folder, not a file. Please use the input_folder option: ', input_file)
+            return
+        if not os.path.isfile(input_file):
+            print('ERROR: your input file does not exist: ', input_file)
+            return
+        if (station is None) or (year is None) or (doy is None):
+            file_station, file_year, file_doy, version = rnx.identify_rinex_file(input_file)
+            # anything you told the code yourself wins over what the file says
+            station = station or file_station
+            year = year or file_year
+            doy = doy or file_doy
+            if (station is None) or (year is None) or (doy is None) or (version == 0):
+                print('ERROR: I could not work out the station, year, and day of year for ', input_file)
+                print('Neither the filename nor the header told me. Please provide them on the command line.')
+                return
+            print('Your input file is station ', station, ' year:', year, ' doy:', doy)
+    elif (station is None) or (year is None) or (doy is None):
+        print('You must provide station, year, and day of year, or use input_file or input_folder. Exiting')
+        return
 
     #
     if doy_end is None:
@@ -563,6 +627,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     if orb == 'gps+glo':
         orb = 'jax'
 
+    # everything below here is about finding a file. You already have one
+    if input_file is not None:
+        rnx.translate_rinex_file(input_file, station, year, doy, snr, orb, dec, overwrite, gzip)
+        return
+
     rate = rate.lower()
     # default is set to low.  set to high for 1sec files so the user doesn't have to
     if samplerate == 1:
@@ -661,7 +730,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     args = {'station': station, 'year':year, 'doy':doy, 'isnr': snr, 'orbtype': orb, 'rate': rate,
             'dec_rate': dec, 'archive': archive, 'nol': nolook, 'overwrite': overwrite,
             'srate': samplerate, 'mk': mk, 'stream': stream,
-            'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip, 'timeout' : timeout, 'quiet' : quiet }
+            'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip, 'timeout' : timeout }
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
 
@@ -742,6 +811,117 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
         mb = round(total_bytes / 1e6, 1)
         summary += f'. Wrote {mb} MB of SNR files to disk'
     print(summary)
+
+
+def translate_folder(folder, snr, orb, dec, overwrite, gzip, extension, par=1):
+    """
+    Translates every RINEX observation file in a folder. Each file is identified on
+    its own, so the folder may hold more than one station and more than one day.
+    The settings you give are handed to every file. Files that cannot be identified
+    as RINEX are skipped. Subdirectories are not searched.
+
+    Parameters
+    ----------
+    folder : str
+        directory holding the RINEX files
+    snr : int
+        SNR file type, i.e. 66 or 99
+    orb : str
+        orbit choice, used for every file in the folder
+    dec : int
+        decimation value in seconds
+    overwrite : bool
+        whether SNR files that already exist are remade
+    gzip : bool
+        whether SNR files are gzipped after creation
+    extension : str
+        tells the code to use settings stored in the gnssir json for this extension
+    par : int
+        number of files translated at the same time, up to ten
+
+    """
+    rinex_files = []
+    skipped = []
+    for f in sorted(os.listdir(folder), key=str.lower):
+        path = os.path.join(folder, f)
+        if not os.path.isfile(path):
+            continue
+        station, year, doy, version = rnx.identify_rinex_file(path)
+        if (station is None) or (year is None) or (doy is None) or (version == 0):
+            skipped.append(f)
+        else:
+            rinex_files.append((path, station, year, doy))
+
+    print('Found ', len(rinex_files), ' RINEX files in ', folder)
+    if skipped:
+        shown = ', '.join(skipped[0:5])
+        if len(skipped) > 5:
+            shown = shown + ' and ' + str(len(skipped) - 5) + ' more'
+        print('Skipping ', len(skipped), ' files I could not identify as RINEX: ', shown)
+    if not rinex_files:
+        return
+
+    settings = {'snr': snr, 'orb': orb, 'dec': dec, 'overwrite': overwrite, 'gzip': gzip, 'extension': extension}
+
+    if par <= 1:
+        for path, station, year, doy in rinex_files:
+            print('')
+            print(os.path.basename(path), ' >>> station ', station, ' year:', year, ' doy:', doy)
+            try:
+                rinex2snr(station, year, doy, input_file=path, **settings)
+            except Exception as e:
+                print('Error of some kind translating ', path)
+                print(f"Error type: {type(e)}. Error message: {e}")
+        print('')
+        print('Finished the ', len(rinex_files), ' RINEX files in ', folder)
+        return
+
+    if par > 10:
+        print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
+        sys.exit()
+
+    print('Per-file output suppressed in parallel mode. Run without -par to see detailed output.')
+    manager = multiprocessing.Manager()
+    error_queue = manager.Queue()
+    pool = multiprocessing.Pool(processes=par)
+
+    worker_args = [(path, station, year, doy, settings, error_queue) for path, station, year, doy in rinex_files]
+    ok = 0
+    fail = 0
+    with tqdm(pool.imap_unordered(rinex2snr_file_worker, worker_args), total=len(rinex_files),
+              desc='rinex2snr ' + os.path.basename(os.path.normpath(folder)), unit='file') as pbar:
+        for worked in pbar:
+            if worked:
+                ok += 1
+            else:
+                fail += 1
+            pbar.set_postfix_str(f"{ok} ok, {fail} fail")
+
+    pool.close()
+    pool.join()
+
+    if not error_queue.empty():
+        print("One (or more) of the processes encountered errors.")
+        i = 1
+        while not error_queue.empty():
+            e = error_queue.get()
+            print(f"Error {i} type: {type(e)}. Error {i} message: {e}")
+            i += 1
+
+    print('Finished the ', len(rinex_files), ' RINEX files in ', folder)
+
+
+def rinex2snr_file_worker(worker_args):
+    """Worker for parallel input_folder translation. Returns whether it ran without error."""
+    path, station, year, doy, settings, error_queue = worker_args
+    try:
+        with contextlib.redirect_stdout(open(os.devnull, 'w')):
+            rinex2snr(station, year, doy, input_file=path, **settings)
+        return True
+    except Exception as e:
+        print('Error of some kind translating ', path)
+        error_queue.put(e)
+        return False
 
 
 def snr_file_size(station, year, doy, snr_type):

@@ -1,11 +1,15 @@
 import datetime
 import gzip as gzip_mod
+import io
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import re
 from scipy.interpolate import interp1d, CubicSpline
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 
 
@@ -48,7 +52,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     return fname
 
 def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol,overwrite,srate,
-                  mk, stream,strip,bkg,screenstats,gzip,timeout,quiet):
+                  mk, stream,strip,bkg,screenstats,gzip,timeout):
     """
     main code to convert RINEX files into SNR files.
     It works on a single year and doy.
@@ -99,12 +103,9 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
     timeout : int
         optional parameter I am testing out for requests timeout parameter
         in seconds
-    quiet : bool
-        whether gfzrnx messages are printed to the screen (T) or suppressed (F)
 
     """
     #
-    #print('quiet option ', quiet)
     xdir = os.environ['REFL_CODE']
     gpsonly = False
 
@@ -1543,4 +1544,230 @@ def set_rinex2snr_logs(station,year,doy):
     log = open(general_log, 'w+')
 
     return log, general_log
+
+def identify_rinex_file(input_file):
+    """
+    Works out the station, year, day of year, and RINEX version of a RINEX
+    observation file provided by the user.
+
+    Standard RINEX 2.11 and RINEX 3 filenames give the station and the date.
+    The header is then read for the RINEX version, and for the station and date
+    if the filename did not have them.
+
+    Parameters
+    ----------
+    input_file : str
+        name of a RINEX 2.11 or RINEX 3 observation file. It may be gzipped,
+        unix compressed, and/or Hatanaka compressed.
+
+    Returns
+    -------
+    station : str
+        4 character lowercase station name. None if it could not be found.
+    year : int
+        full year. None if it could not be found.
+    doy : int
+        day of year. None if it could not be found.
+    version : int
+        major RINEX version, i.e. 2 or 3. Zero means the file could not be identified.
+
+    """
+    station = None
+    year = None
+    doy = None
+    version = 0
+
+    basename = os.path.basename(input_file)
+
+    name3 = re.match(r'^([a-z0-9]{4})[0-9]{2}[a-z]{3}_[a-z]_([0-9]{4})([0-9]{3})[0-9]{4}_', basename, re.IGNORECASE)
+    name2 = re.match(r'^([a-z0-9]{4})([0-9]{3})[a-z0-9]\.([0-9]{2})[od](\.gz|\.Z)?$', basename, re.IGNORECASE)
+    if name3:
+        station = name3.group(1).lower()
+        year = int(name3.group(2))
+        doy = int(name3.group(3))
+        version = 3
+    elif name2:
+        cyy = int(name2.group(3))
+        station = name2.group(1).lower()
+        year = 2000 + cyy if cyy < 80 else 1900 + cyy
+        doy = int(name2.group(2))
+        version = 2
+
+    if not os.path.isfile(input_file):
+        return station, year, doy, version
+
+    header = []
+    uncompressed = None
+    try:
+        if input_file.endswith('.Z'):
+            uncompressed = subprocess.Popen(['uncompress', '-c', input_file], stdout=subprocess.PIPE)
+            fid = io.TextIOWrapper(uncompressed.stdout, errors='ignore')
+        elif input_file.endswith('.gz'):
+            fid = gzip_mod.open(input_file, 'rt', errors='ignore')
+        else:
+            fid = open(input_file, 'r', errors='ignore')
+        with fid:
+            for line in fid:
+                header.append(line)
+                if (line[60:80].strip() == 'END OF HEADER') or (len(header) > 2000):
+                    break
+    except (OSError, EOFError):
+        return station, year, doy, version
+    finally:
+        if uncompressed is not None:
+            uncompressed.terminate()
+            uncompressed.wait()
+
+    month = 0
+    day = 0
+    for line in header:
+        label = line[60:80].strip()
+        if label == 'RINEX VERSION / TYPE':
+            try:
+                version = int(float(line[0:9]))
+            except ValueError:
+                pass
+            # navigation and meteorological files say so here, and we only want observations
+            if line[20:21] not in ('O', ' ', ''):
+                version = 0
+                break
+        elif (label == 'MARKER NAME') and (station is None):
+            marker = line[0:60].strip()
+            if len(marker) >= 4:
+                station = marker[0:4].lower()
+        elif (label == 'TIME OF FIRST OBS') and (doy is None):
+            try:
+                year, month, day = int(line[0:6]), int(line[6:12]), int(line[12:18])
+            except ValueError:
+                year = None
+                month = 0
+        elif label == 'END OF HEADER':
+            break
+
+    if (month > 0) and (day > 0) and (year is not None):
+        try:
+            doy, cdoy, cyyyy, cyy = g.ymd2doy(year, month, day)
+        except ValueError:
+            year = None
+
+    return station, year, doy, version
+
+def translate_rinex_file(input_file, station, year, doy, isnr, orbtype, dec_rate, overwrite, gzip):
+    """
+    Translates a RINEX observation file provided by the user into an SNR file.
+    The file is copied into a temporary directory and decompressed there, so the
+    file you provide is left exactly as it was.
+
+    Parameters
+    ----------
+    input_file : str
+        name of a RINEX 2.11 or RINEX 3 observation file. It may be gzipped,
+        unix compressed, and/or Hatanaka compressed.
+    station : str
+        station name. Only the first four characters are used, as that is what
+        the SNR filename needs.
+    year : int
+        full year
+    doy : int
+        day of year
+    isnr : int
+        SNR file type choice, i.e. 66, 88
+    orbtype : str
+        orbit type, e.g. nav, gbm, gfr
+    dec_rate : int
+        decimation value
+    overwrite : bool
+        whether an existing SNR file is remade
+    gzip : bool
+        whether the SNR file is gzipped after creation
+
+    """
+    input_file = os.path.abspath(input_file)
+    if not os.path.isfile(input_file):
+        print('ERROR: your input file does not exist: ', input_file)
+        return
+
+    version = identify_rinex_file(input_file)[3]
+    if version == 0:
+        print('ERROR: I could not work out which RINEX version this file is: ', input_file)
+        return
+
+    station = station[0:4].lower()
+    cyyyy, cyy, cdoy = g.ydoych(year, doy)
+    csnr = str(isnr)
+    snrname_full = quickname(station, year, cyy, cdoy, csnr)
+    if g.snr_exist(station, year, doy, csnr):
+        snr_on_disk = snrname_full + '.gz' if os.path.isfile(snrname_full + '.gz') else snrname_full
+        if overwrite:
+            print('SNR file exists/you requested overwriting, existing file will be deleted')
+            os.remove(snr_on_disk)
+        else:
+            print('SNR file already exists', snr_on_disk, '\n')
+            return
+
+    g.make_nav_dirs(year)
+    log, gen_log = set_rinex2snr_logs(station, year, doy)
+    print('General log: ', gen_log)
+    log.write('Translating the RINEX file you provided: {0:s} \n'.format(input_file))
+    log.write('RINEX version {0:1.0f} \n'.format(version))
+
+    workdir = tempfile.mkdtemp()
+    try:
+        obsfile = os.path.join(workdir, os.path.basename(input_file))
+        try:
+            if input_file.endswith('.gz'):
+                obsfile = obsfile[0:-3]
+                with gzip_mod.open(input_file, 'rb') as f_in:
+                    rinex_data = f_in.read()
+                with open(obsfile, 'wb') as f_out:
+                    f_out.write(rinex_data)
+            elif input_file.endswith('.Z'):
+                shutil.copy(input_file, obsfile)
+                subprocess.call(['uncompress', obsfile])
+                obsfile = obsfile[0:-2]
+            else:
+                shutil.copy(input_file, obsfile)
+        except (OSError, EOFError) as error:
+            print('ERROR: I was not able to decompress your input file: ', input_file)
+            print(error)
+            log.write('Decompression of {0:s} failed \n'.format(input_file))
+            return
+
+        if not os.path.isfile(obsfile) or (os.path.getsize(obsfile) == 0):
+            print('ERROR: I was not able to decompress your input file: ', input_file)
+            log.write('Decompression of {0:s} failed \n'.format(input_file))
+            return
+
+        with open(obsfile, 'r', errors='ignore') as fid:
+            first_line = fid.readline()
+        if 'CRINEX' in first_line[60:80]:
+            crnxpath = g.hatanaka_version()
+            hatanaka_out = ''
+            if not os.path.exists(crnxpath):
+                g.hatanaka_warning()
+            else:
+                # CRX2RNX only accepts crx and yyd endings, and it names its own output
+                hatanaka_in = os.path.join(workdir, 'hatanaka_input.crx')
+                os.rename(obsfile, hatanaka_in)
+                before = os.listdir(workdir)
+                subprocess.call([crnxpath, hatanaka_in])
+                new_files = [f for f in os.listdir(workdir) if f not in before]
+                if len(new_files) == 1:
+                    hatanaka_out = os.path.join(workdir, new_files[0])
+                    if os.path.getsize(hatanaka_out) == 0:
+                        hatanaka_out = ''
+            if not hatanaka_out:
+                print('ERROR: I was not able to translate your Hatanaka compressed file: ', input_file)
+                log.write('Hatanaka translation of {0:s} failed \n'.format(input_file))
+                return
+            obsfile = hatanaka_out
+
+        if version >= 3:
+            conv2snr(year, doy, station, isnr, orbtype, 'local', dec_rate, 'local', log, rinex3_filename=obsfile, gzip=gzip)
+        else:
+            conv2snr(year, doy, station, isnr, orbtype, 'local', dec_rate, 'local', log, rinex2_filename=obsfile, gzip=gzip)
+    finally:
+        if not log.closed:
+            log.close()
+        shutil.rmtree(workdir, ignore_errors=True)
 

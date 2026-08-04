@@ -144,9 +144,7 @@ you must unzip them before running gnssrefl.
 
 ### RINEX 3
 
-While we support RINEX 3 files, we do not read the RINEX 3 
-file itself - we rely on the <code>gfzrnx</code> 
-utility developed by Thomas Nischan at GFZ to translate from RINEX 3+ to RINEX 2.11
+RINEX 3 files are read directly, so no translation to RINEX 2.11 is needed.
 If you have RINEX 3 files, they should be all upper case (except for the extension rnx or crx).
 
 Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx

@@ -71,7 +71,6 @@ those discussion links will likely go away in the not very distant future.
 * [mjd](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.mjd.html)
 * [query_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.query_unr.html)
 * [rinex3_rinex2](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex3_rinex2.html)
-* [rinex3_snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex3_snr.html)
 * [rinex_coords](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex_coords.html)
 * [smoosh](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.smoosh.html)
 * [smoosh_snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.smoosh_snr.html)
