@@ -7,12 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 4.2.1
 
+
 Fixing bug in rinex3_snr - was not properly finding crx files in your own directory
 
 Allow users to remove GEO satellites that cause warnings.  These don't pass normal
 QC anyway, but it was annoying to see all the warnings. 
 exclude_satellites is now put in the gnssir json by hand - but could be added to gnssir_input.py
 If not wanted, it should be set to the empty list, []. Otherwise, don't add it at all.
+
+Updated unsupported scripts for downloading veg metrics, download_teqc.py.  Also veg_multiyr,
+but that one needs more work.
 
 ## 4.2.0
 

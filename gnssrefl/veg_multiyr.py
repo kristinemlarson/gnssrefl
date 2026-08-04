@@ -5,6 +5,7 @@ combine multiple years of teqc multipath metrics,
 write a file, and make a plot
 
 updated to include gz versions of teqc log
+should be updated to gzip them back....
 """
 import argparse
 import matplotlib.pyplot as plt
@@ -154,8 +155,8 @@ def main():
             endv = g.dec31(y) + 1
             for d in range(1, endv):
                 if not in_winter(d,winter1,winter2):
-                    sfile = veg.sfilename(station, y, d)
-                    if os.path.isfile(sfile):
+                    sfile, sexist = veg.sfilename(station, y, d)
+                    if sexist:
                         mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
                         if requested_rcv:
                             k+=1
@@ -165,8 +166,8 @@ def main():
         for y in range(y1,y2):
             endv = g.dec31(y) + 1
             for d in range(1,endv):
-                sfile = veg.sfilename(station, y, d)
-                if os.path.isfile(sfile):
+                sfile, sexist = veg.sfilename(station, y, d)
+                if sexist:
                     mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
                     if requested_rcv:
                         k+=1
@@ -176,5 +177,7 @@ def main():
     print(k, ' daily observations')
     if k > 0:
         newvegplot(vegout,station,ylimits)
+    # should gzip all those files you opened ...
+
 if __name__ == "__main__":
     main()

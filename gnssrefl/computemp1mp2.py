@@ -45,6 +45,8 @@ def sfilename(station, year, doy):
     """
     Finds mp1 filename on your system
 
+    gunzips if needed
+
     Parameters
     ----------
     station : string
@@ -58,6 +60,9 @@ def sfilename(station, year, doy):
     -------
     xfile : string
         the full SNR filename on your local system
+    sexist : bool
+        whether file exists
+
     """
     cdoy = '{:03d}'.format(doy)
     cyyyy = str(year)
@@ -65,8 +70,17 @@ def sfilename(station, year, doy):
     ddir = os.environ['REFL_CODE'] + '/' + cyyyy + '/mp/' + station + '/'
 
     xfile = ddir+ station + cdoy + '0.' + cyy + 'S'
+    sexist = False
 
-    return xfile
+    if os.path.isfile(xfile):
+        sexist = True
+    else: 
+        if os.path.isfile(xfile + '.gz'):
+            subprocess.call(['gunzip', xfile + '.gz'])
+        if os.path.isfile(xfile):
+            sexist = True
+
+    return xfile, sexist
 
 def ReadRecAnt(teqclog):
     """

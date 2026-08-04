@@ -1,4 +1,4 @@
-# gnssrefl v4.2.0
+# gnssrefl v4.2.1
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 
