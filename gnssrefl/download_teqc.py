@@ -3,6 +3,8 @@
 download a year of teqc logs from unavco
 can do multiple years as well
 2022 september 15, updated to https access
+2026 august 3, updated for earthscope/password
+
 """
 import argparse
 import os
@@ -13,6 +15,9 @@ import wget
 
 import gnssrefl.gps as g
 import gnssrefl.computemp1mp2 as veg
+# for downloads from unavco/earthscope
+import gnssrefl.kelly as kelly
+
 
 
 def mpfile_unavco(station, year, doy):
@@ -39,10 +44,10 @@ def mpfile_unavco(station, year, doy):
 
     # info for unavco 
     # - changed to https 2022 september 15
-    fdir = 'https://data.unavco.org/archive/gnss/rinex/qc/'
-    #       https://data.unavco.org/archive/gnss/rinex/qc/2010/001/
-    # old way
-    #fdir = 'ftp://data-out.unavco.org/pub/rinex/qc/'
+    # fdir = 'https://data.unavco.org/archive/gnss/rinex/qc/'
+    # changed from unavco to earthscope .... 
+    fdir = 'https://data.earthscope.org/archive/gnss/rinex/qc/'
+
     fdir = fdir + cyyyy + '/' + cdoy + '/'
     fname = station + cdoy + '0.' + cyy + 'S'
     url = fdir + fname
@@ -55,16 +60,14 @@ def mpfile_unavco(station, year, doy):
         print('This should have been created by download_teqc')
         sys.exit()
 
-    print('Looking for: ', url)
-    print('Will store in: ', ddir)
 
     if os.path.isfile(ddir + fname):
         print('teqc log already exists', ddir+fname)
+    elif os.path.isfile(ddir + fname + '.gz'):
+        print('gzipped teqc log already exists', ddir+fname + '.gz')
     else:
-        try:
-            wget.download(url,out=fname)
-        except:
-            print('download failed for ', fname)
+        print('Looking for: ', url)
+        foundit,fname = kelly.the_kelly_simple_way(url,fname)
         if os.path.isfile(fname):
            subprocess.call(['mv', fname, ddir])
            print('\n SUCCESS', ddir + '/' + fname)
@@ -114,7 +117,8 @@ def download_teqc(station: str, year: int, year_end: int = None):
     for y in range(y1, y2):
         veg.check_directories(station, y)
         # life is short - assume it is always a leap year
-        for d in range(1, 367):
+        end_day = g.dec31(y)  
+        for d in range(1, (end_day+1)):
             mpfile_unavco(station, y, d)
 
 

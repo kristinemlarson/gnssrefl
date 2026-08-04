@@ -3,6 +3,8 @@
 kristine larson
 combine multiple years of teqc multipath metrics, 
 write a file, and make a plot
+
+updated to include gz versions of teqc log
 """
 import argparse
 import matplotlib.pyplot as plt
@@ -15,14 +17,14 @@ import wget
 
 import gnssrefl.gps as g
 import gnssrefl.computemp1mp2 as veg
-def in_winter(d):
+def in_winter(day, winter1, winter2):
     """(td testing autodoc api generation)
 
     pretty silly winter screen tool
 
     Parameters
     ----------
-    d : int
+    day : int
         day of year
 
     Returns
@@ -31,11 +33,11 @@ def in_winter(d):
         True if doy is in winter, False if not considered "winter".
     """
     inwinter = False
-    if (d < 105) or (d > 274):
+    if (day < winter1) or (day > winter2):
         inwinter = True
     return inwinter 
 
-def newvegplot(vegout,station):
+def newvegplot(vegout,station,ylimits):
     """
     send the file name and try to make a plot segreating for 
     changes in teqc metric and receiver type
@@ -72,6 +74,8 @@ def newvegplot(vegout,station):
         k = k + 1
     plt.legend(loc="lower left")
     plt.ylabel('-L1 rms (m)')
+    if len(ylimits) > 0:
+        plt.ylim(ylimits)
     plt.grid()
     plt.title('L1 Multipath Statistics for ' + station.upper() )
     plt.show()
@@ -104,6 +108,8 @@ def main():
     parser.add_argument("year2", help="end year", type=int)
     parser.add_argument("-rcvtype", default = None, help="Receiver type", type=str)
     parser.add_argument("-winter", default = None, help="Removes winter points", type=str)
+    parser.add_argument("-winter_vals",  nargs="*", default = [], type=int, help="doy: end of winter, start of winter")
+    parser.add_argument("-ylimits",  nargs="*", default = [], type=float, help="ylimits")
 
     args = parser.parse_args()
 
@@ -117,6 +123,14 @@ def main():
         sys.exit()
 
     vegout = vegoutfile(station)
+
+    winter1 = 105;
+    winter2 = 274;
+    if len(args.winter_vals) > 0: 
+        winter1 = args.winter_vals[0]
+        winter2 = args.winter_vals[1]
+
+    ylimits = args.ylimits
 
     y1 = args.year1
     y2 = args.year2 + 1
@@ -137,8 +151,9 @@ def main():
     k = 0
     if winterMask:
         for y in range(y1,y2):
-            for d in range(1,367):
-                if not in_winter(d):
+            endv = g.dec31(y) + 1
+            for d in range(1, endv):
+                if not in_winter(d,winter1,winter2):
                     sfile = veg.sfilename(station, y, d)
                     if os.path.isfile(sfile):
                         mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
@@ -148,7 +163,8 @@ def main():
                             vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}  {4:s} {5:2.0f} {6:2.0f} \n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile,mm,dd))
     else:
         for y in range(y1,y2):
-            for d in range(1,367):
+            endv = g.dec31(y) + 1
+            for d in range(1,endv):
                 sfile = veg.sfilename(station, y, d)
                 if os.path.isfile(sfile):
                     mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
@@ -159,6 +175,6 @@ def main():
     vegid.close()
     print(k, ' daily observations')
     if k > 0:
-        newvegplot(vegout,station)
+        newvegplot(vegout,station,ylimits)
 if __name__ == "__main__":
     main()
