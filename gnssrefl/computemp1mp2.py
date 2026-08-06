@@ -150,6 +150,8 @@ def readoutmp(teqcfile,rcvtype):
         if  rcvtype in line:
             foundRec = True
     f.close()
+    line = ['gzip', teqcfile]
+    subprocess.call(line)
     return mp12, mp1, foundRec, rcvtypeinfile
 
 

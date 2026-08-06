@@ -18,6 +18,39 @@ import wget
 
 import gnssrefl.gps as g
 import gnssrefl.computemp1mp2 as veg
+def writeout_one_year(station, year,rcvtype):
+    """
+    if file exists, return values. otherwise write out a file
+    """
+    fileout = vegoutfile(station, year)
+    if os.path.isfile(fileout):
+        data = np.loadtxt(fileout,usecols=(0,1,2,3),comments='%')
+        vegreceiver = np.genfromtxt(fileout, usecols=4,dtype='str')
+        k=len(data)
+        return k, data, vegreceiver
+    else:
+        vegid = open(fileout, 'w+')
+
+    endv = g.dec31(year) + 1
+    k=0
+    for d in range(1,endv):
+        yy,mm,dd= g.ydoy2ymd(year,d)
+        mp1rms = 0
+        foundit = False
+        sfile, sexist = veg.sfilename(station, year, d)
+        if sexist:
+            mp1rms, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
+            mp1rms = float(mp1rms)
+            k=k+1
+            vegid.write("{0:4.0f} {1:3.0f} {2:8.4f} {3:8.4f}  {4:s} {5:2.0f} {6:2.0f} \n".format(year,d, mp1rms, float(mp1), rcvinfile,mm,dd))
+
+    vegid.close()
+    data = np.loadtxt(fileout,usecols=(0,1,2,3),comments='%')
+    vegreceiver = np.genfromtxt(fileout, usecols=4,dtype='str')
+
+    return k , data, vegreceiver
+
+
 def in_winter(day, winter1, winter2):
     """(td testing autodoc api generation)
 
@@ -38,50 +71,8 @@ def in_winter(day, winter1, winter2):
         inwinter = True
     return inwinter 
 
-def newvegplot(vegout,station,ylimits):
-    """
-    send the file name and try to make a plot segreating for 
-    changes in teqc metric and receiver type
-    """
-    # get the numerical data
-    tv = np.loadtxt(vegout,usecols=(0,1,2,3))
-    # read the receiver type separately ... because it is a string
-    r = np.genfromtxt(vegout,usecols=(4),dtype='str')
-    rcvs = np.unique(r)
-# number of receivers
-    N = len(rcvs)
-    colors = 'brybrybry'
-    plt.figure()
-    k=0
-    for i in range(0,N):
-        receiver = rcvs[i]
-    # find the indices with the correct receiver
-        ii = (receiver == r)
-        outx = tv[ii,0] + tv[ii,1]/365.25
-    # now segreate by those that are not zero ... because teqc changed
-    # from using MP1 to MP12
-        outcol2 = tv[ii,2]
-        outcol3 = tv[ii,3]
-        ii = (outcol2 > 0)
-        jj = (outcol3 > 0)
-    # since we have a legend we don't want to plot it when it is empty
-        xout = np.append(outx[ii],outx[jj])
-        yout = np.append(-outcol2[ii],-outcol3[jj])
-        plt.plot(xout,yout,'.', label=receiver)
-        #if (len(outx[ii]) > 0):
-        #    plt.plot(outx[ii], -outcol2[ii],dd,label=receiver)
-        #if (len(outx[jj]) > 0):
-        #    plt.plot(outx[jj], -outcol3[jj],dd,label=receiver)
-        k = k + 1
-    plt.legend(loc="lower left")
-    plt.ylabel('-L1 rms (m)')
-    if len(ylimits) > 0:
-        plt.ylim(ylimits)
-    plt.grid()
-    plt.title('L1 Multipath Statistics for ' + station.upper() )
-    plt.show()
 
-def vegoutfile(station):
+def vegoutfile(station,year):
     """
     make sure directories exist for prelim veg output file
     returns name of the otuput file
@@ -92,8 +83,12 @@ def vegoutfile(station):
     vegdir = vegdir + '/veg'
     if not os.path.isdir(vegdir):
         subprocess.call(['mkdir',vegdir])
-    vegout =  vegdir + '/' + station + '_veg.txt'
-    print('File will be written to: ', vegout)
+    vegdir = vegdir  + '/' + station
+    if not os.path.isdir(vegdir):
+        subprocess.call(['mkdir',vegdir])
+
+    vegout =  vegdir + '/' + station + '_' + str(year) + '_veg.txt'
+    print(vegout)
 
     return vegout 
 
@@ -108,33 +103,39 @@ def main():
     parser.add_argument("year1", help="beginning year", type=int)
     parser.add_argument("year2", help="end year", type=int)
     parser.add_argument("-rcvtype", default = None, help="Receiver type", type=str)
-    parser.add_argument("-winter", default = None, help="Removes winter points", type=str)
+    parser.add_argument("-winter", default = 'F', help="Whether snow masking is done (T)", type=str)
     parser.add_argument("-winter_vals",  nargs="*", default = [], type=int, help="doy: end of winter, start of winter")
     parser.add_argument("-ylimits",  nargs="*", default = [], type=float, help="ylimits")
 
     args = parser.parse_args()
 
+    print('First time thru this can be slow because it is reading/writing/gzipping a gazillion')
+    print('teqc logs. But once that is done, it will be faster and you can')
+    print('investigate various choices. But until you recreate the analysis stream')
+    print('used by PBO H2O you will not have a true vegetation stat. Read Larson and Small 2014.')
+    print('Plus, you will need to do something about the receiver changes.')
+
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-#   assign to normal variables
     station = args.station
     if len(station) != 4:
-        print('illegal station - must be 4 char')
+        print('illegal station name - must be 4 char')
         sys.exit()
 
-    vegout = vegoutfile(station)
-
-    winter1 = 105;
-    winter2 = 274;
-    if len(args.winter_vals) > 0: 
-        winter1 = args.winter_vals[0]
-        winter2 = args.winter_vals[1]
+    # default is no
+    winterMask = False
+    if args.winter == 'T':
+          winterMask = True
+          if len(args.winter_vals) ==2 : 
+              winter1 = args.winter_vals[0]
+              winter2 = args.winter_vals[1]
+          else:
+              winter1 = 105; winter2 = 274; 
 
     ylimits = args.ylimits
 
-    y1 = args.year1
-    y2 = args.year2 + 1
+    y1 = args.year1 ; y2 = args.year2 
 
     if args.rcvtype == None:
         # do not restrict as the default
@@ -143,41 +144,53 @@ def main():
         rcvtype = args.rcvtype
 
     # should add a header
-    vegid = open(vegout,'w+')
+    k=0
+    dataout = np.empty(shape=[0, 4])
+    rout = np.empty(shape=[0, 1])
+    for year in range(y1,y2+1):
+        nobs,data,rcvout = writeout_one_year(station, year,rcvtype)
+        dataout = np.vstack((dataout,data))
+        v = np.reshape(rcvout, (len(rcvout), 1))
+        rout = np.vstack((rout, v))
 
-    if args.winter == None:
-        winterMask = False
-    else:
-        winterMask = True
-    k = 0
+        k = k + nobs
+
     if winterMask:
-        for y in range(y1,y2):
-            endv = g.dec31(y) + 1
-            for d in range(1, endv):
-                if not in_winter(d,winter1,winter2):
-                    sfile, sexist = veg.sfilename(station, y, d)
-                    if sexist:
-                        mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
-                        if requested_rcv:
-                            k+=1
-                            yy,mm,dd= g.ydoy2ymd(y,d)
-                            vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}  {4:s} {5:2.0f} {6:2.0f} \n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile,mm,dd))
-    else:
-        for y in range(y1,y2):
-            endv = g.dec31(y) + 1
-            for d in range(1,endv):
-                sfile, sexist = veg.sfilename(station, y, d)
-                if sexist:
-                    mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
-                    if requested_rcv:
-                        k+=1
-                        yy,mm,dd= g.ydoy2ymd(y,d)
-                        vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}  {4:s} {5:2.0f} {6:2.0f} \n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile,mm,dd))
-    vegid.close()
-    print(k, ' daily observations')
+        doy = dataout[:,1]
+        r1 = np.where(np.logical_and(doy > winter1 , doy < winter2))[0]
+#r1 = np.where(np.logical_and(vegdumb[:,1] > 90, vegdumb[:,1] < 290))[0]
+        rout = rout[r1]
+        dataout = dataout[r1,:]
+
+    receiver_types = np.unique(rout)
+    # number of receivers
+    N = len(receiver_types)
+    print(len(dataout), ' daily observations and ', N, ' receiver types')
+
     if k > 0:
-        newvegplot(vegout,station,ylimits)
-    # should gzip all those files you opened ...
+        plt.figure()
+        for i in range(0,N):
+            rname = receiver_types[i]
+            r1 = dataout[np.where(rout==rname)[0]]
+            outx = r1[:,0] + r1[:,1]/365.25
+            jj = (r1[:,2] > 0)
+            kk = (r1[:,3] > 0)
+            xout = np.append(outx[jj],outx[kk])
+            yout = np.append( -r1[jj,2], -r1[kk,3])
+            plt.plot(xout, yout, '.',label=rname)
+
+    # since we have a legend we don't want to plot it when it is empty
+
+        plt.title('L1 Multipath Statistics for ' + station.upper() )
+        plt.grid()
+        plt.legend(loc="upper left")
+        plt.ylabel('-L1 rms (m)')
+        if len(ylimits) == 2:
+            plt.ylim((ylimits))
+        plt.show()
+
+
+
 
 if __name__ == "__main__":
     main()
