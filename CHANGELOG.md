@@ -5,10 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 4.2.2
+
+[Fixed Bug in reading Wuhan ultra rapids](https://github.com/kristinemlarson/gnssrefl/pull/426)
+If you are trying to use any orbit that is multi-day, you need to update your code.
+There is nothing wrong with the orbit files, just the way gnssrefl was reading them.
+
+[Highrate RINEX files from GA now allowed](https://github.com/kristinemlarson/gnssrefl/pull/427)
+
+
 ## 4.2.1
 
 
-Fixing bug in rinex3_snr - was not properly finding crx files in your own directory
 
 Allow users to remove GEO satellites that cause warnings.  These don't pass normal
 QC anyway, but it was annoying to see all the warnings. 
@@ -18,9 +26,10 @@ If not wanted, it should be set to the empty list, []. Otherwise, don't add it a
 Updated unsupported scripts for downloading veg metrics, download_teqc.py.  Also veg_multiyr,
 but that one needs more work.
 
+originally I fix bug in rinex3_snr - was not properly finding crx files in your own directory. But now 
+we have a better way to avoid this, using updates to rinex2snr
 Updates to rinex2snr now allow input of [RINEX 3 files that live in your disk](https://github.com/kristinemlarson/gnssrefl/pull/424).
-
-For that reason, rinex3_snr no longer exists.
+rinex3_snr no longer exists.
 
 ## 4.2.0
 
