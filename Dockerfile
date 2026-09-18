@@ -1,8 +1,8 @@
 # 2025 jan 29 trying python 3.10 again
 # important ! https://endoflife.date/debian
-FROM python:3.10-slim-bookworm
+#FROM python:3.10-slim-bookworm
 # this does work but i don't think i need to go to python 3.11 yet
-#FROM python:3.11-slim-bullseye
+FROM python:3.11-slim-bullseye
 #FROM python:3.10-slim-buster 
 #FROM python:3.9-slim-buster 
 #FROM python:3.8-slim-buster 
