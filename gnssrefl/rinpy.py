@@ -127,6 +127,13 @@ def _readheader_v21x(lines):
                 epochflag = int(lines[i][28])
             except IndexError:
                 break  # truncated epoch header, stop parsing
+
+            # this means you have a crap line ??
+            if len(lines[i]) == 29:
+                print('Illegal block in RINEX file')
+                print(lines[i])
+                break
+
             if epochflag in (0, 1, 6):  # CHECK EPOCH FLAG  STATUS
                 headerlines.append(i)
                 year, month, day, hour = lines[i][1:3], lines[i][4:6], lines[i][7:9], lines[i][10:12]
@@ -142,19 +149,35 @@ def _readheader_v21x(lines):
                 week, sow = g.kgpsweek(century+int(year), int(month), int(day), int(hour), int(minute), int(float(second)))
                 gpstime_list.append((week, sow))
 
-                numsats = int(lines[i][29:32])  # Number of visible satellites %i3
-                headerlengths.append(1 + (numsats-1)//12)  # number of lines in header, depends on how many svs on view
+                try:
+                    numsats = int(lines[i][29:32])  # Number of visible satellites %i3
+                    headerlengths.append(1 + (numsats-1)//12)  # number of lines in header, depends on how many svs on view
+                except:
+                    print('Illegal block in RINEX file ')
+                    print(lines[i])
+                    break
+
 
                 if numsats > 12:
-                    sv = []
-                    for s in range(numsats):
-                        if s > 0 and s % 12 == 0:
-                            i += 1
-                        sv.append(lines[i][32+(s % 12)*3:35+(s % 12)*3])
-                    epochsatlists.append(sv)
+                    try:
+                        sv = []
+                        for s in range(numsats):
+                            if s > 0 and s % 12 == 0:
+                                i += 1
+                            sv.append(lines[i][32+(s % 12)*3:35+(s % 12)*3])
+                        epochsatlists.append(sv)
+                    except:
+                        print('Illegal block in RINEX file ')
+                        print(lines[i])
+                        break
 
                 else:
-                    epochsatlists.append([lines[i][32+s*3:35+s*3] for s in range(numsats)])
+                    try:
+                        epochsatlists.append([lines[i][32+s*3:35+s*3] for s in range(numsats)])
+                    except:
+                        print('Illegal block in RINEX nonsense')
+                        print(lines[i])
+                        break
 
                 i += numsats*rowpersat+1
 

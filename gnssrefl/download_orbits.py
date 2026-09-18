@@ -60,6 +60,8 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
             nav-cddis : GPS broadcast file from CDDIS, very slow to download
 
+            repro3 : GFZ reprocessed precise orbits, multi-GNSS I believe
+
             igs : IGS precise, GPS only
 
             igr : IGS rapid, GPS only
@@ -101,7 +103,7 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
     g.check_environ_variables()
 
     orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 
-            'gnss', 'gfr', 'esa', 'gnss2', 'gnss3','gnss-gfz','ultra', 'rapid','nav-esa', 'nav-sopac','nav-cddis','wum2']
+            'gnss', 'gfr', 'esa', 'gnss2', 'gnss3','gnss-gfz','ultra', 'rapid','nav-esa', 'nav-sopac','nav-cddis','wum2','repro3']
 
 #   assign to normal variables
     pCtr = orbit
@@ -165,6 +167,10 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                     filename, fdir, foundit = g.getsp3file_flex(year, month, day, pCtr)
                 elif (pCtr == 'wum2'):
                      filename,fdir,foundit = g.get_wuhan_orbits(year,month,day,hour)
+                elif (pCtr == 'repro3'):
+                    foundit = False
+                    filename, fdir, foundit = g.one_gfz_archive_to_rule_them_all(year, month, day,'repro3',0)
+
                 elif (pCtr == 'gfr'):
                     foundit = False
                     if year >= 2022:

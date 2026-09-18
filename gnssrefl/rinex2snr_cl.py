@@ -261,6 +261,8 @@ def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str =
 
             nav : GPS broadcast, perfectly adequate for reflectometry. Same as gps.
 
+            repro3 : GFZ reprocessed multi-GNSS
+
             igs : IGS precise, GPS only
 
             igr : IGS rapid, GPS only
@@ -589,7 +591,7 @@ def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str =
     #
     orbit_list = ['gps', 'gps+glo', 'gnss', 'nav', 'igs', 'igr', 'jax', 'gbm',
                   'grg', 'wum', 'wum2', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2',
-                  'nav-sopac', 'nav-esa', 'nav-cddis', 'gnss3', 'gnss-gfz']
+                  'nav-sopac', 'nav-esa', 'nav-cddis', 'gnss3', 'gnss-gfz','repro3']
     if orb not in orbit_list:
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)
@@ -599,6 +601,9 @@ def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str =
     # if you choose GPS, you get the nav message
     if orb == 'gps':
         orb = 'nav'
+
+    if orb == 'repro3':
+        print('new option,  reprocessed GFZ')
 
     if orb == 'rapid':
         orb = 'gfr'

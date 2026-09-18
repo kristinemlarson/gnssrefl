@@ -3307,6 +3307,8 @@ def get_orbits_setexe(year,month,day,orbtype):
                 f,orbdir,foundit=another_gfz_orbits(year,month,day,'rapid',0)
         else:
             f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
+    elif (orbtype == 'repro3'):
+        f,orbdir,foundit = one_gfz_archive_to_rule_them_all(year,month,day,'repro3',0)
     elif (orbtype == 'rapid'):
         if (year >= 2022):
             print('Using newest GFZ orbit code for rapid')
@@ -4623,12 +4625,13 @@ def read_simon_williams(filename,outfilename):
         fout.write("% (1) (2) (3) (4)  (5)   (6)    (7)     (8)   (9)   (10)   (11)  (12)  (13)  (14)     (15)\n")
 
     # read the file three times because i am loadtxt impaired
+    # should really define comment line instead of skipping 11 rows
     # string
-    tv = np.loadtxt(filename,usecols=(0,1,2,3),skiprows=10,dtype='str',delimiter=',')
+    tv = np.loadtxt(filename,usecols=(0,1,2,3),skiprows=11,dtype='str',delimiter=',')
     # integers
-    ivals = np.loadtxt(filename,usecols=(4,5),skiprows=10, dtype='int',delimiter=',')
+    ivals = np.loadtxt(filename,usecols=(4,5),skiprows=11, dtype='int',delimiter=',')
     # floats
-    fvals = np.loadtxt(filename,usecols=(6),skiprows=10, dtype='float',delimiter=',')
+    fvals = np.loadtxt(filename,usecols=(6),skiprows=11, dtype='float',delimiter=',')
     # store the latter columns directly
     prn = ivals[:,0]
     fr = ivals[:,1]
@@ -7461,12 +7464,16 @@ def one_gfz_archive_to_rule_them_all(year,month,day,orbtype,hour):
     xdir = 'https://isdc-data.gfz.de/gnss/products/' + orbtype +  '/' 
 
     url = xdir + 'w'  + str(wk) + '/' 
+    print(url)
 
 
     if orbtype == 'rapid':
         filename = 'GFZ0OPSRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
     elif orbtype == 'ultra':
         filename = 'GFZ0OPSULT_' + cyyyy + cdoy + chour + '00_02D_05M_ORB.SP3'
+    elif orbtype == 'repro3':
+        filename = 'GFZ2R03FIN_' + cyyyy + cdoy + chour + '00_01D_05M_ORB.SP3'
+        print(filename)
     elif orbtype == 'final':
         filename = 'GFZ0OPSFIN_' + cyyyy + cdoy + '0000_01D_15M_ORB.SP3'
     else:

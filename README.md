@@ -1,17 +1,23 @@
-# gnssrefl v4.2.2
+# gnssrefl v4.2.3
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 
 **News**
+
+* added new orbit source (repro3, which is multi-GNSS GFZ, useful for older data?)
+
+* improved behavior on the new python reader with illegally formatted Rinex 2.11 files
+
+* Our sister [web app for reflection zones](https://gnss-reflections.org/rzones) now uses 
+open mapping sources. Google maps have been removed.
+
+**Older News**
 
 * fixed a bug while using Wuhan ultra rapid orbits. Please update your code or you will 
 only get solutions once a week.
 
 * rinex3_snr is no longer supported. George Townsend added this capability to rinex2snr.
 
-
-
-**Older News**
 
 * fixed a bug in the docker release.
 

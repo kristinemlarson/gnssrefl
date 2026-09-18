@@ -198,3 +198,6 @@ Need to find a better place for it
 # for listings of ftp sites
 
 ~/Documents/Code/Listings
+
+
+python3.10 -m venv env
