@@ -152,9 +152,9 @@ def _readheader_v21x(lines):
                 try:
                     numsats = int(lines[i][29:32])  # Number of visible satellites %i3
                     headerlengths.append(1 + (numsats-1)//12)  # number of lines in header, depends on how many svs on view
-                except:
+                except IndexError:
                     print('Illegal block in RINEX file ')
-                    print(lines[i])
+                    numsats = 0
                     break
 
 
@@ -166,17 +166,15 @@ def _readheader_v21x(lines):
                                 i += 1
                             sv.append(lines[i][32+(s % 12)*3:35+(s % 12)*3])
                         epochsatlists.append(sv)
-                    except:
+                    except IndexError:
                         print('Illegal block in RINEX file ')
-                        print(lines[i])
                         break
 
                 else:
                     try:
                         epochsatlists.append([lines[i][32+s*3:35+s*3] for s in range(numsats)])
-                    except:
+                    except IndexError:
                         print('Illegal block in RINEX nonsense')
-                        print(lines[i])
                         break
 
                 i += numsats*rowpersat+1

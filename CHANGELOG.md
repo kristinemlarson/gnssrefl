@@ -9,9 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 added repro3 orbit option (GFZ multi-GNSS from the earlier days)
 
 Fixed rinex2snr that was crapping out when the last datablock was illegal.
-Files had been made by teqc ----
+Please let me know if it continues to fail.
 
-
+Cleaned up some of the smoke tests. Removed use of sopac.
 
 ## 4.2.2
 
