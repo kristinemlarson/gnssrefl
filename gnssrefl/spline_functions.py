@@ -981,7 +981,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         rh_dn = gps2datenum(np.array(rh_arr[:, 0], dtype=float))
         if not (no_dots):
             plot_tracks(rh_arr, rh_dn)
-            pspec, = plt.plot_date(tplot_dn, rh_spectral_plot, '-.',color='gray')
+            pspec, = plt.plot(tplot_dn, rh_spectral_plot, '-.',color='gray')
             pspec.set_label('cubspl')
 
         if snrfit:
@@ -1028,7 +1028,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
                 else:
                     iout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:2.0f},{6:8.3f},{7:3.0f},{8:13.6f},{9:3.0f}\n".format(y, m, 
                         d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS),lsp_per_hour[whichhour])
-            pjs, = plt.plot_date(tplot_dn, rh_js_plot, '-',color='black')
+            pjs, = plt.plot(tplot_dn, rh_js_plot, '-',color='black')
             pjs.set_label('invmod')
             iout.close()
 
@@ -1341,49 +1341,49 @@ def plot_tracks(rh_arr, rh_dn):
     mm7 = (rh_arr[:,2] > 300) & (rh_arr[:,11] == 7) # beidou
 
     if len(rh_dn[mm]) > 0:
-        psec, = plt.plot_date(rh_dn[mm], rh_arr[mm, 1], '<',color='magenta',markersize=ms)
+        psec, = plt.plot(rh_dn[mm], rh_arr[mm, 1], '<',color='magenta',markersize=ms)
         psec.set_label('BDS L2')
     if len(rh_dn[mm6]) > 0:
-        psec, = plt.plot_date(rh_dn[mm6], rh_arr[mm6, 1], '+',color='magenta',markersize=ms)
+        psec, = plt.plot(rh_dn[mm6], rh_arr[mm6, 1], '+',color='magenta',markersize=ms)
         psec.set_label('BDS L6')
     if len(rh_dn[mm7]) > 0:
-        psec, = plt.plot_date(rh_dn[mm7], rh_arr[mm7, 1], 'v',color='magenta',markersize=ms)
+        psec, = plt.plot(rh_dn[mm7], rh_arr[mm7, 1], 'v',color='magenta',markersize=ms)
         psec.set_label('BDS L7')
 
     if len(rh_dn[ii]) > 0:
-        psec, = plt.plot_date(rh_dn[ii], rh_arr[ii, 1], 'o',color='blue',markersize=ms)
+        psec, = plt.plot(rh_dn[ii], rh_arr[ii, 1], 'o',color='blue',markersize=ms)
         psec.set_label('GPS L1')
 
     if len(rh_dn[ii2]) > 0:
-        psec, = plt.plot_date(rh_dn[ii2], rh_arr[ii2, 1], '<',color='blue',markersize=ms)
+        psec, = plt.plot(rh_dn[ii2], rh_arr[ii2, 1], '<',color='blue',markersize=ms)
         psec.set_label('GPS L2')
 
     if len(rh_dn[ii5]) > 0:
-        psec, = plt.plot_date(rh_dn[ii5], rh_arr[ii5, 1], 's',color='blue',markersize=ms)
+        psec, = plt.plot(rh_dn[ii5], rh_arr[ii5, 1], 's',color='blue',markersize=ms)
         psec.set_label('GPS L5')
 
     if len(rh_dn[kk]) > 0:
-        psec, = plt.plot_date(rh_dn[kk], rh_arr[kk, 1], 'o',color='orange',markersize=ms)
+        psec, = plt.plot(rh_dn[kk], rh_arr[kk, 1], 'o',color='orange',markersize=ms)
         psec.set_label('GAL L1')
 
     if len(rh_dn[kk5]) > 0:
-        psec, = plt.plot_date(rh_dn[kk5], rh_arr[kk5, 1], 's',color='orange',markersize=ms)
+        psec, = plt.plot(rh_dn[kk5], rh_arr[kk5, 1], 's',color='orange',markersize=ms)
         psec.set_label('GAL L5')
 
     if len(rh_dn[kk6]) > 0:
-        psec, = plt.plot_date(rh_dn[kk6], rh_arr[kk6, 1], '+',color='orange',markersize=ms)
+        psec, = plt.plot(rh_dn[kk6], rh_arr[kk6, 1], '+',color='orange',markersize=ms)
         psec.set_label('GAL L6')
 
     if len(rh_dn[kk7]) > 0:
-        psec, = plt.plot_date(rh_dn[kk7], rh_arr[kk7, 1], 'v',color='orange',markersize=ms)
+        psec, = plt.plot(rh_dn[kk7], rh_arr[kk7, 1], 'v',color='orange',markersize=ms)
         psec.set_label('GAL L7')
 
     if len(rh_dn[jj]) > 0:
-        psec, = plt.plot_date(rh_dn[jj], rh_arr[jj, 1], 'ro',markersize=ms)
+        psec, = plt.plot(rh_dn[jj], rh_arr[jj, 1], 'ro',markersize=ms)
         psec.set_label('GLO L1')
 
     if len(rh_dn[jj2]) > 0:
-        psec, = plt.plot_date(rh_dn[jj2], rh_arr[jj2, 1], '<', color='red',markersize=ms)
+        psec, = plt.plot(rh_dn[jj2], rh_arr[jj2, 1], '<', color='red',markersize=ms)
         psec.set_label('GLO L2')
 
 def kristine_dictionary(alld,sat,xsignal):
@@ -1679,4 +1679,3 @@ def set_refraction_model(station, dmjd, station_config, imodel):
         #print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
 
     return p,T,irefr, e, Tm, la
-
