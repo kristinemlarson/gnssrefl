@@ -33,9 +33,10 @@ quickLook sc02 2023  120 -azim1 60 -azim2 240 -e2 13 -h2 12 -h1 2.5 -plt F
 
 subdaily sc02 2023 -extension docker -plt F 
 #
+# # i will put these back in after I accept new Townsend PR
 # invsnr
-invsnr_input sc02 -h1 2.5 -h2 10 -e1 5 -e2 13 -azim1 60 -azim2 220
-invsnr sc02 2023 120 L1+L2+L5 -plt F
+# invsnr_input sc02 -h1 2.5 -h2 10 -e1 5 -e2 13 -azim1 60 -azim2 220
+# invsnr sc02 2023 120 L1+L2+L5 -plt F
 
 
 # smoke test for nmea2snr
