@@ -11,6 +11,16 @@ from gnssrefl.gnss_frequencies import gps_default_frequencies, all_default_frequ
 from gnssrefl.utils import str2bool, FileManagement, FileTypes, expand_amplitudes
 
 
+def parse_satellite_list(value):
+    """Parse a comma-separated list of satellite numbers."""
+    try:
+        return [int(satellite.strip()) for satellite in value.split(',') if satellite.strip()]
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            'satellites must be a comma-separated list of integers'
+        ) from exc
+
+
 def parse_arguments():
     # user inputs the observation file information
     parser = argparse.ArgumentParser()
@@ -62,13 +72,15 @@ def parse_arguments():
     parser.add_argument("-archive", default=None, type=str, help="optional archive value used when creating SNR files")
     parser.add_argument("-Hdates", nargs="*", type=str, help="dates of Hortho values(testing)")
     parser.add_argument("-gzip", default=None, type=str, help="Re-gzip SNR files after gnssir reads them, default is T")
+    parser.add_argument("-include_geo", default=None, type=str, help="Include GEO satellites; default is False")
+    parser.add_argument("-exclude_satellites", default=None, type=parse_satellite_list, help="Comma-separated satellite numbers to exclude")
 
     args = parser.parse_args().__dict__
 
     g.print_version_to_screen()
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['allfreq', 'l1', 'l2c', 'l5', 'xyz', 'refraction','subdaily_alt_sigma', 'gzip']
+    boolean_args = ['allfreq', 'l1', 'l2c', 'l5', 'xyz', 'refraction','subdaily_alt_sigma', 'gzip', 'include_geo']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -87,11 +99,13 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
                       subdaily_knots : int=None, subdaily_sigma: float=None, subdaily_subdir: str=None, 
                       subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None, snr: int=None, 
                       stream: str=None , samplerate: int=None, dec: int=None, orb: str=None, archive: str=None,
-                      Hdates: str=None, gzip: bool=True):
+                      Hdates: str=None, gzip: bool=True, include_geo: bool=False,
+                      exclude_satellites: list=None):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
     to a json file which by default is saved in REFL_CODE/<station>.json. This code replaces make_json_input.
+    Use include_geo and exclude_satellites to configure satellite exclusions.
 
 
     This version no longer requires you to have azimuth regions of 90-100 degrees. You can set a single set of 
@@ -331,6 +345,12 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         Uses format of 2024-11-01 15:22
         You must include all of these values in this format (i.e. you cannot leave off HH:MM)
 
+    include_geo : bool, optional
+        include GEO satellites. Default is False.
+
+    exclude_satellites : list of int, optional
+        additional satellites to exclude. Default is an empty list.
+
 
     """
     if Hdates is None:
@@ -521,6 +541,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     # command line req to only do a single satellite - default is do all satellites
     station_config['onesat'] = None
+
+    station_config['include_geo'] = include_geo
+    station_config['exclude_satellites'] = exclude_satellites or []
 
     # default will now be False ....
     # send some information on periodogram RH retrievals to the screen

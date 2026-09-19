@@ -32,7 +32,14 @@ from tqdm import tqdm
 import gnssrefl.gps as g
 from gnssrefl.read_snr_files import read_snr
 from gnssrefl.utils import circular_mean_deg, circular_distance_deg, FileManagement
-from gnssrefl.gnss_frequencies import all_frequencies, get_snr_column, get_scale_factor, get_file_suffix, get_glonass_channel
+from gnssrefl.gnss_frequencies import (
+    BEIDOU_GEO_SATS,
+    all_frequencies,
+    get_file_suffix,
+    get_glonass_channel,
+    get_scale_factor,
+    get_snr_column,
+)
 from gnssrefl.tracks import active_epoch_days, attach_legacy_apriori, attach_track_id, build_lookup_index, lookup_arc
 
 # Constants
@@ -386,6 +393,29 @@ def apply_refraction(snr_array, station_config, year, doy, verbose=True):
     return snr_array[valid_mask]
 
 
+def get_excluded_satellites(station_config=None):
+    """Return the union of user exclusions and the default GEO exclusions."""
+    if station_config is None:
+        station_config = {}
+    excluded = set(station_config.get('exclude_satellites') or [])
+    if not station_config.get('include_geo', False):
+        excluded.update(BEIDOU_GEO_SATS)
+    return excluded
+
+
+def filter_excluded_satellites(
+    snr_array: np.ndarray,
+    station_config: Optional[Dict[str, Any]] = None,
+) -> np.ndarray:
+    """Remove default BeiDou GEO and additional user-excluded satellites."""
+    excluded = get_excluded_satellites(station_config)
+
+    if not excluded or snr_array.size == 0:
+        return snr_array
+
+    return snr_array[~np.isin(snr_array[:, 0], list(excluded))]
+
+
 def extract_arcs_from_station(
     station: str,
     year: int,
@@ -498,13 +528,7 @@ def extract_arcs_from_station(
         print(f'No usable SNR data for {station} {year} {doy}, skipping')
         return []
 
-    # testing, KL, allow removal of GEO Beidou , testing on ALTG data ...
-    if 'exclude_satellites' in station_config:
-        satlist = station_config['exclude_satellites']
-        if len(satlist) > 0:
-            for sat in satlist:
-                j= (snr_array[:,0] == sat)
-                snr_array = np.delete(snr_array, j, axis=0)
+    snr_array = filter_excluded_satellites(snr_array, station_config)
 
     # Apply refraction correction
     if station_config is not None and station_config.get('refraction', False):
@@ -1251,7 +1275,7 @@ def extract_arcs_from_tracks(tracks_json):
         raise FileNotFoundError(f'station config not found for {station} (extension={extension!r}): {json_path}')
     with open(json_path) as f:
         station_config = json.load(f)
-    cfg = {**station_config, 'savearcs': False}
+    station_config = {**station_config, 'savearcs': False}
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as tf:
         json.dump(tracks_json, tf)
@@ -1272,7 +1296,7 @@ def extract_arcs_from_tracks(tracks_json):
                             track_file=temp_track_file,
                             track_cache=track_cache,
                             extension=extension,
-                            station_config=cfg,
+                            station_config=station_config,
                             refraction_verbose=False,
                         )
                     silent_buf.truncate(0)

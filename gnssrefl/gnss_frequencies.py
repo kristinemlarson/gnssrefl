@@ -68,11 +68,14 @@ CONSTELLATIONS = {
     'GPS':     {'sat_range': (1, 33),   'offset': 0},
     'GLONASS': {'sat_range': (101, 129), 'offset': 100},
     'Galileo': {'sat_range': (201, 241), 'offset': 200},
-    'BeiDou':  {'sat_range': (301, 361), 'offset': 300},
+    'BeiDou':  {'sat_range': (301, 363), 'offset': 300},
 }
 
-# BeiDou GEO + IGSO satellites (non-MEO), currently excluded.
-BEIDOU_NON_MEO_SATS = frozenset({301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 313, 338, 339, 340, 359, 360, 361})
+# BeiDou orbit classes. GEO satellites are excluded by default because
+# their nearly stationary geometry does not produce normal rising/setting arcs.
+BEIDOU_GEO_SATS = frozenset({301, 302, 303, 304, 305, 359, 360, 361, 362})
+BEIDOU_IGSO_SATS = frozenset({306, 307, 308, 309, 310, 313, 316, 331, 338, 339, 340, 356})
+BEIDOU_NON_MEO_SATS = BEIDOU_GEO_SATS | BEIDOU_IGSO_SATS
 
 # ---------------------------------------------------------------------------
 # Frequency registry

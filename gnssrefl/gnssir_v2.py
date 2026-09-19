@@ -161,10 +161,6 @@ def gnssir_guts_v2(station, year, doy, snr_type, extension, station_config, debu
         print('Midnite option enabled: loading +/- 2 hours from adjacent days')
 
     from gnssrefl.extract_arcs import extract_arcs_from_station
-    if 'exclude_satellites' not in station_config:
-        station_config['exclude_satellites'] = []
-
-
     try:
         arcs = extract_arcs_from_station(
             station, year, doy, freq=freqs, snr_type=snr_type,
@@ -968,5 +964,4 @@ def convert_Hdates_mjd(Hdates,remove_hhmm):
         mjd_Hortho.append(m)
 
     return mjd_Hortho 
-
 

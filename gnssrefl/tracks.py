@@ -51,7 +51,7 @@ SID_DAY = 0.99726958  # solar days
 MJD_EPOCH = datetime(1858, 11, 17)
 
 # Per-constellation ground-track repeat period(s) in sidereal days.
-# BeiDou GEO/IGSO are filtered upstream via BEIDOU_NON_MEO_SATS.
+# BeiDou GEO/IGSO satellites are excluded because this model supports MEO tracks.
 CONSTELLATION_INFO = {
     'GPS':     {'T_sid_list': [1]},
     'GLONASS': {'T_sid_list': [8]},
@@ -130,11 +130,23 @@ def load_arcs(station, year, year_end, extension, snr_type=66, fast=False):
       frequencies gnssir was configured to run, and requires a prior gnssir run
       with ``save_failqc=True``.
 
-    BeiDou GEO/IGSO PRNs in BEIDOU_NON_MEO_SATS are skipped here so the
-    rest of the pipeline never sees them.
+    Satellite exclusions from the analysis JSON are applied while loading.
+    BeiDou GEO/IGSO satellites are always excluded because this model supports
+    MEO tracks only.
     """
     # Deferred: circular with extract_arcs.
-    from gnssrefl.extract_arcs import RESULT_COLUMNS, extract_arcs_from_station, load_results_with_failqc
+    from gnssrefl.extract_arcs import (
+        RESULT_COLUMNS,
+        extract_arcs_from_station,
+        get_excluded_satellites,
+        load_results_with_failqc,
+    )
+
+    station_config = read_json_file(station, extension=extension, noexit=True, silent=True)
+    if not station_config and not fast:
+        raise FileNotFoundError(f'station config not found for {station} (extension={extension!r})')
+    excluded_sats = get_excluded_satellites(station_config)
+    excluded_sats.update(BEIDOU_NON_MEO_SATS)
 
     rows = []
     t0 = time.time()
@@ -158,7 +170,7 @@ def load_arcs(station, year, year_end, extension, snr_type=66, fast=False):
                 n_days += 1
                 for i in range(results.shape[0]):
                     sat = int(results[i, COL_SAT])
-                    if sat in BEIDOU_NON_MEO_SATS:
+                    if sat in excluded_sats:
                         continue
                     rows.append({
                         'year': y, 'doy': doy, 'sat': sat,
@@ -173,15 +185,12 @@ def load_arcs(station, year, year_end, extension, snr_type=66, fast=False):
             raise RuntimeError('no arcs loaded from results/+failQC/: run gnssir first or use -source snr to build tracks directly from SNR files')
         return pd.DataFrame(rows)
 
-    cfg = read_json_file(station, extension=extension, noexit=True, silent=True)
-    if not cfg:
-        raise FileNotFoundError(f'station config not found for {station} (extension={extension!r})')
-    e1 = cfg['e1']
-    e2 = cfg['e2']
-    pele = cfg['pele']
+    e1 = station_config['e1']
+    e2 = station_config['e2']
+    pele = station_config['pele']
 
     # Don't trigger savearcs side-effects from the gnssir json
-    cfg = {**cfg, 'savearcs': False}
+    station_config = {**station_config, 'savearcs': False}
 
     freqs_all = all_frequencies()
     print(f'extracting arcs for {station} {year}-{year_end}, e1={e1} e2={e2}, {len(freqs_all)} freqs')
@@ -199,7 +208,7 @@ def load_arcs(station, year, year_end, extension, snr_type=66, fast=False):
                         snr_type=snr_type,
                         e1=e1, e2=e2, pele=pele,
                         detrend=False,
-                        station_config=cfg,
+                        station_config=station_config,
                         screenstats=False,
                         refraction_verbose=False,
                     )
@@ -825,5 +834,3 @@ def active_epoch_days(tracks_json):
                 days.add((dt.year, doy))
                 cur += 1
     return days
-
-
