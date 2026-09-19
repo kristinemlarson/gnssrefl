@@ -5050,6 +5050,7 @@ def get_wuhan_orbits(year: int, month: int, day: int, hour: int) -> [str, str, b
     foundit = False
     gps_week, _ = kgpsweek(year, month, day, 0, 0, 0)
     _, _, doy, _, _, _ = ymd2ch(year, month, day)
+    product_year = year
 
     # they changed the name from ULT to NRT around year 2024 doy 187
     url_base = f'ftp://igs.gnsswhu.cn/pub/gnss/products/mgex/{gps_week}/'
@@ -5060,21 +5061,22 @@ def get_wuhan_orbits(year: int, month: int, day: int, hour: int) -> [str, str, b
     if (year + doy/365.25) >= (2024 + 187/365.25):
         # do the day before and use NRT instead of ULT
         if doy == 1:
-            _, _, doy, _, _, _ = ymd2ch(year-1, 12, 31)
+            product_year = year - 1
+            _, _, doy, _, _, _ = ymd2ch(product_year, 12, 31)
         else:
             doy = doy - 1 
         # ? also need to change the directory from the GPS week
         # get new ymd values
-        tyear, tmonth, tday = ydoy2ymd(year,doy)
+        tyear, tmonth, tday = ydoy2ymd(product_year,doy)
         gps_week, _ = kgpsweek(tyear, tmonth, tday, 0, 0, 0)
         # get new url_base
         url_base = f'ftp://igs.gnsswhu.cn/pub/gnss/products/mgex/{gps_week}/'
 
-        filename = f'WUM0MGXNRT_{year}{doy:03}{hour:02}00_02D_05M_ORB.SP3.gz'
+        filename = f'WUM0MGXNRT_{product_year}{doy:03}{hour:02}00_02D_05M_ORB.SP3.gz'
         unzipped_filename = filename[:-3]
 
     print(filename)
-    orbit_dir = f'{os.environ["ORBITS"]}/{year}/sp3'
+    orbit_dir = f'{os.environ["ORBITS"]}/{product_year}/sp3'
     if not os.path.isfile(f'{orbit_dir}/{unzipped_filename}'):
         try:
             wget.download(f'{url_base}{filename}', filename)
@@ -5084,7 +5086,7 @@ def get_wuhan_orbits(year: int, month: int, day: int, hour: int) -> [str, str, b
             print(f'{url_base}{filename}')
         if os.path.isfile(unzipped_filename):
             print('\n')
-            store_orbitfile(unzipped_filename, year, 'sp3')
+            store_orbitfile(unzipped_filename, product_year, 'sp3')
             foundit = True
     else:
         #print('Wuhan orbit wum2 is stored locally')
@@ -7533,4 +7535,3 @@ def crx2rnx(crnx_filename):
         subprocess.call(['rm', crnx_filename])
 
     return rnx_filename
-

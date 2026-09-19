@@ -90,3 +90,21 @@ def test_checkEGM_creates_missing_files_directory(tmp_path, mocker):
     with mock.patch.dict(os.environ, {"REFL_CODE": str(refl_code)}):
         checkEGM()
     assert (refl_code / "Files").is_dir()
+
+
+def test_get_wuhan_orbits_uses_previous_year_on_january_first(tmp_path, mocker):
+    """The NRT orbit for January 1 is the previous year's December 31 file."""
+    mocker.patch("wget.download")
+    mocker.patch("subprocess.call")
+
+    with mock.patch.dict(os.environ, {"ORBITS": str(tmp_path)}):
+        filename, orbit_dir, found = get_wuhan_orbits(2025, 1, 1, 0)
+
+    expected = "WUM0MGXNRT_20243660000_02D_05M_ORB.SP3"
+    assert filename == expected
+    assert orbit_dir == str(tmp_path / "2024" / "sp3")
+    assert found is False
+    wget.download.assert_called_once_with(
+        f"ftp://igs.gnsswhu.cn/pub/gnss/products/mgex/2347/{expected}.gz",
+        f"{expected}.gz",
+    )
