@@ -1058,8 +1058,11 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     # start the figure, convert from doy to MJD to obstime
     # not sure this is still used?
-    mjd0 = g.fdoy2mjd(year,th[0])
-    th_obs = sd.mjd_to_obstimes(mjd0 + th-th[0])
+    # yes, the answer is it is not, and caused the code to crash ... sigh. 2026 9 20
+    # mjd0 = g.fdoy2mjd(year,th[0])
+    #print(mjd0,year)
+    #print(th[0],th[-1])
+    #th_obs = sd.mjd_to_obstimes(mjd0 + th-th[0])
 
     #get datetime values
     th_obs = sd.mjd_to_obstimes(th)

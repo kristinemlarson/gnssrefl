@@ -201,3 +201,7 @@ Need to find a better place for it
 
 
 python3.10 -m venv env
+
+# smoke tests
+
+have a set of files that can be used, thus avoid downloading from archives.

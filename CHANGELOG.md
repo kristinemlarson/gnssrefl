@@ -11,7 +11,18 @@ added repro3 orbit option (GFZ multi-GNSS from the earlier days)
 Fixed rinex2snr that was crapping out when the last datablock was illegal.
 Please let me know if it continues to fail.
 
-Cleaned up some of the smoke tests. Removed use of sopac.
+Cleaned up some of the smoke tests. Removed most uses of sopac.
+
+https://github.com/kristinemlarson/gnssrefl/pull/433
+
+https://github.com/kristinemlarson/gnssrefl/pull/432
+
+Matlabplotlib issue with new numpy required a rewrite in invsnr
+(plot_dates no longer exists)
+
+Removed odd error in subdaily that I have never seen before - complaints about leap seconds
+when computing datetime objects for plotting - but it was caused
+by code that no longer needed to exist.
 
 ## 4.2.2
 

@@ -30,7 +30,8 @@ def mjd_to_obstimes(mjd):
 
     """
 
-    dt = Time(mjd,format='mjd').utc.datetime; 
+    #dt = Time(mjd,format='mjd').utc.datetime; 
+    dt = Time(mjd,format='mjd').datetime; 
 
     return dt
 

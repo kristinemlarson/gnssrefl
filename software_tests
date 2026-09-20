@@ -35,8 +35,8 @@ subdaily sc02 2023 -extension docker -plt F
 #
 # # i will put these back in after I accept new Townsend PR
 # invsnr
-# invsnr_input sc02 -h1 2.5 -h2 10 -e1 5 -e2 13 -azim1 60 -azim2 220
-# invsnr sc02 2023 120 L1+L2+L5 -plt F
+invsnr_input sc02 -h1 2.5 -h2 10 -e1 5 -e2 13 -azim1 60 -azim2 220
+invsnr sc02 2023 120 L1+L2+L5 -plt F
 
 
 # smoke test for nmea2snr
@@ -76,8 +76,8 @@ refl_zones p103 -azlist 90 180 270 360 -fr 2
 # case where station coordinates provided
 #gnssir_input xxxx  -lat 40 -lon -120 -height 10  -h1 5 -h2 20 -e1 5 -e2 15
 
-download_orbits nav 2010 1 1
-download_orbits igs 2010 1 1
+download_orbits nav 2010 1 10
+download_orbits igs 2010 1 10
 #download_orbits gbm 2018 1 1
 
 # removed unavco - now will go to sopac first
