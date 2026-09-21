@@ -102,7 +102,8 @@ def _readheader_v21x(lines):
             header[line[60:80].strip()] += "\n"+line[:60]
             # concatenate to the existing string
 
-    rowpersat = 1 + (len(header['# / TYPES OF OBSERV'][6:].split())-1) // 5
+    nobstypes = len(header['# / TYPES OF OBSERV'][6:].split())
+    rowpersat = 1 + (nobstypes-1) // 5
 
     timeoffirstobs = [part for part in header['TIME OF FIRST OBS'].split()]
 
@@ -118,70 +119,55 @@ def _readheader_v21x(lines):
     # This will result in an error if the record overlaps the end of the century. So if someone feels this is a major
     # problem, feel free to fix it. Personally can't bother to do it...
 
-    pattern = re.compile('(\s{2}\d|\s\d{2}){2}')
+    pattern = re.compile(r'(\s{2}\d|\s\d{2}){2}')
 
     while i < len(lines):
         if pattern.match(lines[i][:6]):  # then it's the first line in a header record
             try:
                 epochflag = int(lines[i][28])
-            except IndexError:
+            except (IndexError, ValueError):
                 break  # truncated epoch header, stop parsing
 
-            # this means you have a crap line ??
             if len(lines[i]) == 29:
                 print('Illegal block in RINEX file')
                 print(lines[i])
-                break
+                break  # final header stops after the epoch flag
 
             if epochflag in (0, 1, 6):  # CHECK EPOCH FLAG  STATUS
-                headerlines.append(i)
                 year, month, day, hour = lines[i][1:3], lines[i][4:6], lines[i][7:9], lines[i][10:12]
                 minute, second = lines[i][13:15], lines[i][16:26]
-
-                obstimes.append(datetime.datetime(year=century+int(year),
-                                                  month=int(month),
-                                                  day=int(day),
-                                                  hour=int(hour),
-                                                  minute=int(minute),
-                                                  second=int(float(second)),
-                                                  microsecond=int(float(second) % 1 * 100000)))
-
-                week, sow = g.kgpsweek(century+int(year), int(month), int(day), int(hour), int(minute), int(float(second)))
-                gpstime_list.append((week, sow))
-
                 try:
                     numsats = int(lines[i][29:32])  # Number of visible satellites %i3
-                    headerlengths.append(1 + (numsats-1)//12)  # number of lines in header, depends on how many svs on view
-                except IndexError:
+                except ValueError:
                     print('Illegal block in RINEX file ')
-                    numsats = 0
-                    break
+                    break  # satellite-count field is blank or incomplete
+                headerlength = 1 + (max(numsats, 1)-1)//12
+                datastart = i + headerlength
+                if datastart > len(lines):
+                    break  # truncated satellite list
+                sv = [lines[i+s//12][32+(s % 12)*3:35+(s % 12)*3] for s in range(numsats)]
+                if any(len(sat) != 3 for sat in sv):
+                    break  # truncated satellite list
+                available = min(numsats, (len(lines)-datastart)//rowpersat)
+                if (available and datastart + available*rowpersat == len(lines)
+                        and not lines[-1].endswith('\n')
+                        and len(lines[-1]) < 16*(nobstypes-5*(rowpersat-1))):
+                    available -= 1  # EOF cut through the final observation line
+                if not available and numsats:
+                    break  # no complete observations follow this epoch header
 
-
-                if numsats > 12:
-                    try:
-                        sv = []
-                        for s in range(numsats):
-                            if s > 0 and s % 12 == 0:
-                                i += 1
-                            sv.append(lines[i][32+(s % 12)*3:35+(s % 12)*3])
-                        epochsatlists.append(sv)
-                    except IndexError:
-                        print('Illegal block in RINEX file ')
-                        break
-
-                else:
-                    try:
-                        epochsatlists.append([lines[i][32+s*3:35+s*3] for s in range(numsats)])
-                    except IndexError:
-                        print('Illegal block in RINEX nonsense')
-                        break
-
-                i += numsats*rowpersat+1
+                headerlines.append(i)
+                headerlengths.append(headerlength)
+                obstimes.append(datetime.datetime(year=century+int(year),
+                                                  month=int(month), day=int(day), hour=int(hour),
+                                                  minute=int(minute), second=int(float(second)),
+                                                  microsecond=int(float(second) % 1 * 100000)))
+                week, sow = g.kgpsweek(century+int(year), int(month), int(day), int(hour), int(minute), int(float(second)))
+                gpstime_list.append((week, sow))
+                epochsatlists.append(sv[:available])
+                i = datastart + numsats*rowpersat
 
             else:  # there was a comment or some header info
-                if epochflag != 4:
-                    print(epochflag)
                 skip = int(lines[i][30:32])
                 i += skip+1
         else:
@@ -223,16 +209,27 @@ def _readheader_v3(lines):
         if lines[i][0] == '>':  # then it's the first line in a header record
             try:
                 epochflag = int(lines[i][31])
-            except IndexError:
+            except (IndexError, ValueError):
                 break  # truncated epoch header, stop parsing
             if epochflag in (0, 1, 6):  # CHECK EPOCH FLAG  STATUS
                 year, month, day, hour = lines[i][2:6], lines[i][7:9], lines[i][10:12], lines[i][13:15]
                 minute, second = lines[i][16:18], lines[i][19:30]
 
-                numsats = int(lines[i][33:35])  # Number of visible satellites %i3
+                try:
+                    numsats = int(lines[i][33:35])  # Number of visible satellites %i3
+                except ValueError:
+                    break  # satellite-count field is blank or incomplete
 
-                if i + 1 + numsats > len(lines):
-                    break  # truncated final epoch, drop it and stop
+                available = min(numsats, len(lines)-i-1)
+                if (available and i + 1 + available == len(lines)
+                        and not lines[-1].endswith('\n')):
+                    system = lines[-1][:1]
+                    obstype_header = header['SYS / # / OBS TYPES'].splitlines()
+                    count = next((int(line[3:6]) for line in obstype_header if line.startswith(system)), 0)
+                    if count and len(lines[-1]) < 3 + 16*(count-1) + 14:
+                        available -= 1  # EOF cut through the final observation line
+                if not available and numsats:
+                    break  # no complete observations follow this epoch header
 
                 headerlines.append(i)
                 obstimes.append(datetime.datetime(year=int(year),
@@ -247,15 +244,13 @@ def _readheader_v3(lines):
                 gpstime_list.append((week, sow))
 
                 sv = []
-                for j in range(numsats):
+                for j in range(available):
                     sv.append(lines[i+1+j][:3])
 
                 i += numsats+1
                 epochsatlists.append(sv)
 
             else:  # there was a comment or some header info
-                if epochflag != 4:
-                    print(epochflag)
                 skip = int(lines[i][30:32])
                 i += skip+1
         else:
