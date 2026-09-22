@@ -87,7 +87,6 @@ def _readheader(lines, rinexversion):
 def _readheader_v21x(lines):
     """ Read rinex version 2.10 and 2.11 
     """
-
     header = {}
     # Capture header info
 
@@ -138,6 +137,7 @@ def _readheader_v21x(lines):
                 headerlines.append(i)
                 year, month, day, hour = lines[i][1:3], lines[i][4:6], lines[i][7:9], lines[i][10:12]
                 minute, second = lines[i][13:15], lines[i][16:26]
+
                 obstimes.append(datetime.datetime(year=century+int(year),
                                                   month=int(month),
                                                   day=int(day),

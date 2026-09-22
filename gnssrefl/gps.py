@@ -938,7 +938,7 @@ def myreadnav(file):
         nephem = int(nephem) #    print(nephem)         
         lines = nav.split('END OF HEADER')[1].splitlines()[1:]
         table = np.zeros((nephem, 32))
-        #print('Total number of ephemeris messages',nephem)
+        print('Total number of ephemeris messages',nephem)
         for i in range(nephem):
             for j in range(8):
                 if j == 0:
@@ -954,7 +954,7 @@ def myreadnav(file):
                     minute = int(lines[i*8+j].split()[5])
                     second = float(lines[i*8+j][17:22])
                     table[i, 0] = prn
-#                    print('Ephem for: ', prn, year, month, day, hour, minute)
+                    #print('Ephem for: ', prn, year, month, day, hour, minute)
                     week, Toc = kgpsweek(year, month, day, hour, minute, second)
                     table[i, 1] =  week
                     table[i, 2] = Toc
@@ -982,6 +982,8 @@ def myreadnav(file):
 #	
         ephem = table
     except:
+        print('problems with the ephemeris read')
+        print(year,month,day, hour, minute, second)
         #print('This ephemeris file does not exist',file)
         ephem = []
     return ephem
@@ -1368,7 +1370,7 @@ def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
 
     return ofac, hifac
 
-def strip_compute(x,y,cf,maxH,desiredP,minH,lsp_method='fast'):
+def strip_compute(x,y,cf,maxH,desiredP,minH,lsp_method='fast',**kwargs):
     """
     strips snr data
 
@@ -1406,6 +1408,8 @@ def strip_compute(x,y,cf,maxH,desiredP,minH,lsp_method='fast'):
     pz : numpy array
         periodogram, y-axis, volts/volts
     """
+    logid = kwargs.get('logid',False)
+
     ofac,hifac = get_ofac_hifac(x,cf,maxH,desiredP)
     if np.isnan(ofac):
         print("WARNING - bad ofac")
@@ -1442,23 +1446,32 @@ def strip_compute(x,y,cf,maxH,desiredP,minH,lsp_method='fast'):
 
 #   find biggest peak
 #   scaling required to get amplitude spectrum
-    pz = 2*np.sqrt(lsp_power/len(x))
+
+    iii = lsp_power < 0
+    # if you found any negative power values ... 
+    if len(lsp_power[iii]) > 0:
+        if logid:
+            logid.write('negative values found in your power spectrum ')
+        pz = []; maxF = 0; maxAmp = 0 ; 
+    else:
+        pz = 2*np.sqrt(lsp_power/len(x))
+
 #   now window
 #    ij = np.argmax(px > minH)
 #    new_px = px[ij]
-    new_pz = pz[(px > minH)]
-    new_px = px[(px > minH)]
-    px = new_px
-    pz = new_pz
+        new_pz = pz[(px > minH)]
+        new_px = px[(px > minH)]
+        px = new_px
+        pz = new_pz
 #   find the max
 #   was causing it to crash.  check that pz has anything in it
-    if len(pz) == 0:
-        print('invalid LSP, no data returned. If this is pervasive, check your inputs')
-        maxF = 0; maxAmp = 0
-    else:
-        ij = np.argmax(pz)
-        maxF = px[ij]
-        maxAmp = np.max(pz)
+        if len(pz) == 0:
+            print('invalid LSP, no data returned. If this is pervasive, check your inputs')
+            maxF = 0; maxAmp = 0
+        else:
+            ij = np.argmax(pz)
+            maxF = px[ij]
+            maxAmp = np.max(pz)
 
     return maxF, maxAmp, eminObs, emaxObs,riseSet, px,pz
 

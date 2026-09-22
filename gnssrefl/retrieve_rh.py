@@ -120,10 +120,19 @@ def retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats
 
                 # LSP computation
                 MJD = g.getMJD(year,month,day, meanTime)
-                maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz = g.strip_compute(x,y,cf,maxH,prec,minH,lsp_method)
+                #maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz = g.strip_compute(x,y,cf,maxH,prec,minH,lsp_method)
+                # I changed this because I was getting warnings - which ultimately were found to be negative
+                # power spectra ... which are illegal.  But it took me forever to figure out which satellite and site
+                # and frequency was causing it because I wasn't writing to the log.  ergo, the log is now sent to
+                # the function
+                maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz = g.strip_compute(x,y,cf,maxH,prec,minH,lsp_method,logid=logid)
 
-                nij = pz[(px > NReg[0]) & (px < NReg[1])]
-                Noise = np.mean(nij) if len(nij) > 0 else 0
+                # this noise value is completely made up
+                if maxAmp == 0 : # flagged as bad in strip_compute
+                    Noise = 100
+                else:
+                    nij = pz[(px > NReg[0]) & (px < NReg[1])]
+                    Noise = np.mean(nij) if len(nij) > 0 else 0
 
                 iAzim = int(az_min_ele)
 
