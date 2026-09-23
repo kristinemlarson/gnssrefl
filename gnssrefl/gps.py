@@ -958,9 +958,9 @@ def myreadnav(file):
                     week, Toc = kgpsweek(year, month, day, hour, minute, second)
                     table[i, 1] =  week
                     table[i, 2] = Toc
-                    Af0 = float(lines[i*8][-3*19:-2*19].replace('D', 'E'))
-                    Af1 = float(lines[i*8][-2*19:-1*19].replace('D', 'E'))
-                    Af2 = float(lines[i*8][-19:].replace('D', 'E'))
+                    Af0 = float(lines[i*8][22:41].replace('D', 'E'))
+                    Af1 = float(lines[i*8][41:60].replace('D', 'E'))
+                    Af2 = float(lines[i*8][60:79].replace('D', 'E'))
                     table[i,3:6] = Af0, Af1, Af2
                 elif j != 7:
                     for k in range(4):
