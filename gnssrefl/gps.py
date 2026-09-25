@@ -5065,14 +5065,18 @@ def get_wuhan_orbits(year: int, month: int, day: int, hour: int) -> [str, str, b
     _, _, doy, _, _, _ = ymd2ch(year, month, day)
     product_year = year
 
-    # they changed the name from ULT to NRT around year 2024 doy 187
     url_base = f'ftp://igs.gnsswhu.cn/pub/gnss/products/mgex/{gps_week}/'
-    # changed this to have hour
-    filename = f'WUM0MGXULT_{year}{doy:03}{hour:02}00_01D_05M_ORB.SP3.gz'
-    unzipped_filename = filename[:-3]
-
-    if (year + doy/365.25) >= (2024 + 187/365.25):
-        # do the day before and use NRT instead of ULT
+    orbit_epoch = (year, doy, hour)
+    if orbit_epoch < (2019, 109, 0):
+        raise ValueError("Wuhan ULA SP3 files in the wum2 archive start at 2019-04-19")
+    if orbit_epoch < (2023, 6, 15):
+        # ULA midnight requests: 2019-04-19 to 2023-01-06.
+        filename = f'WUM0MGXULA_{year}{doy:03}{hour:02}00_01D_05M_ORB.SP3.gz'
+    elif orbit_epoch < (2024, 186, 3):
+        # ULT midnight requests: 2023-01-07 to 2024-07-04.
+        filename = f'WUM0MGXULT_{year}{doy:03}{hour:02}00_01D_05M_ORB.SP3.gz'
+    else:
+        # NRT midnight requests: 2024-07-05 to present.
         if doy == 1:
             product_year = year - 1
             _, _, doy, _, _, _ = ymd2ch(product_year, 12, 31)
@@ -5086,8 +5090,8 @@ def get_wuhan_orbits(year: int, month: int, day: int, hour: int) -> [str, str, b
         url_base = f'ftp://igs.gnsswhu.cn/pub/gnss/products/mgex/{gps_week}/'
 
         filename = f'WUM0MGXNRT_{product_year}{doy:03}{hour:02}00_02D_05M_ORB.SP3.gz'
-        unzipped_filename = filename[:-3]
 
+    unzipped_filename = filename[:-3]
     print(filename)
     orbit_dir = f'{os.environ["ORBITS"]}/{product_year}/sp3'
     if not os.path.isfile(f'{orbit_dir}/{unzipped_filename}'):

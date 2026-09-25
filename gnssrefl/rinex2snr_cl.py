@@ -279,7 +279,8 @@ def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str =
 
             wum : Wuhan ultra-rapid, from CDDIS
 
-            wum2 : Wuhan ultra-rapid, from Wuhan FTP
+            wum2 : Wuhan ultra-rapid, from Wuhan FTP: ULA 2019-04-19 to 2023-01-06;
+                   ULT 2023-01-07 to 2024-07-04; NRT 2024-07-05 to present
 
             ultra: first tries GFZ ultra-rapid then Wuhan, multi-GNSS
 

@@ -1,7 +1,9 @@
 import gzip
+import io
 import stat
 
 import pytest
+import numpy as np
 
 from gnssrefl.rinex2snr import *
 from gnssrefl.gps import *
@@ -157,3 +159,31 @@ def test_cl_refusals(tmp_path, handed_over):
     rnx_cl.rinex2snr()
 
     assert handed_over == []
+
+
+def test_nonfinite_sp3_satellite_does_not_abort_other_satellites(tmp_path, monkeypatch):
+    week, sow = rnx.g.kgpsweek(2023, 1, 28, 0, 0, 0)
+    epochs = [sow - 900, sow - 600, sow - 300, sow]
+    sp3 = np.array(
+        [[sat, week, epoch, x, y, z]
+         for sat, x, y, z in [(1, np.nan, np.nan, np.nan),
+                              (2, 2e7, 1e7, 1e7)]
+         for epoch in epochs], dtype=float)
+    gpstime = np.array([[week, sow]], dtype=float)
+    obsdata = {'G': {'S1': np.array([[40., 41.]])}}
+    monkeypatch.setattr(
+        rnx, 'propagate_and_azel_sp3',
+        lambda iX, iY, iZ, t, *args: (np.full(len(t), 20.), np.full(len(t), 45.)))
+    output = tmp_path / 'test.snr'
+    log = io.StringIO()
+
+    rnx.write_snr_from_sp3(
+        gpstime, sp3, {'G': [1, 2]}, obsdata, {'G': ['S1']},
+        {'G': {1: 0, 2: 1}}, 2023, 1, 28, 0, 90, str(output),
+        np.zeros(3), np.zeros(3), np.zeros(3), np.zeros(3), 0, log)
+
+    rows = output.read_text().splitlines()
+    assert len(rows) == 1
+    assert int(rows[0].split()[0]) == 2
+    assert 'G01' in log.getvalue()
+    assert 'nonfinite SP3' in log.getvalue()
