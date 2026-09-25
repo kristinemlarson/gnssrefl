@@ -448,7 +448,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     tval_mjd = np.asarray(tval_mjd)
     tval = sd.mjd_to_obstimes(tval_mjd) 
     # I think this is plots for section I
-    if plt2screen:
+    #if plt2screen:
+    if True:
 
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 
