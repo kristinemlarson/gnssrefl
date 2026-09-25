@@ -1055,6 +1055,9 @@ def write_snr_from_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year
                     if len(x) == 0:
                         log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
                         continue
+                    if not all(np.isfinite(values).all() for values in (sp3_sec, x, y, z)):
+                        log.write('Skipping {0}{1:02.0f}: nonfinite SP3 orbit position or time\n'.format(con, prn))
+                        continue
                 # fit the orbits for this satellite
                     iX = CubicSpline(sp3_sec, x, extrapolate=True)
                     iY = CubicSpline(sp3_sec, y, extrapolate=True)
