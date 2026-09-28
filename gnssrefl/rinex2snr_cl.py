@@ -257,7 +257,7 @@ def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str =
 
             gnss : use GFZ final orbits, which is multi-GNSS (available in 2-4 days?), but from CDDIS archive
 
-            gnss-gfz : GFZ orbits downloaded from GFZ instead of CDDIS, but do they include beidou?. Same as gnss3?
+            gnss-gfz : GFZ orbits downloaded from GFZ instead of CDDIS
 
             nav : GPS broadcast, perfectly adequate for reflectometry. Same as gps.
 
@@ -540,6 +540,10 @@ def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str =
     else:
         if verbose:
             print('Using command line orbit selection of ', orb)
+
+    if orb in ('gnss-gfz', 'gnss3') and par is not None and par > 5:
+        print('GFZ orbit downloads allow up to -par 5. Exiting.')
+        sys.exit(1)
 
 
     if 'archive' in station_config:
@@ -979,5 +983,4 @@ if __name__ == "__main__":
     # trying this???
     #freeze_support()
     main()
-
 

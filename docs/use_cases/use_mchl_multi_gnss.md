@@ -18,9 +18,9 @@
 
 ## Step 1: GNSS-IR
 
-Generate SNR files for all four constellations over the three-year window. I use `-orb gnss-gfz`, which includes BeiDou, and `-par 10` to use 10 parallel threads. 
+Generate SNR files for all four constellations over the three-year window. I use `-orb gnss-gfz`, which includes BeiDou, and `-par 5` to use 5 parallel threads.
 
-<code>rinex2snr mchl00aus 2023 1 -doy_end 365 -year_end 2025 -archive ga -orb gnss-gfz -par 10</code>
+<code>rinex2snr mchl00aus 2023 1 -doy_end 365 -year_end 2025 -archive ga -orb gnss-gfz -par 5</code>
 
 Set up analysis parameters with all GNSS signals enabled:
 
