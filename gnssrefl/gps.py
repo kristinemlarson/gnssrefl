@@ -693,6 +693,17 @@ def getsp3file_mgex(year,month,day,pCtr):
     #print('Type 1 filename',file1)
     #print('Type 2 filename',file2)
 
+    # Ported to https downloader
+    if not foundit and pCtr == 'gbm':
+        secure_dir = '/gnss/products/' + str(igps_week) + '/'
+        for secure_file in (file2, file1):
+            name = secure_file[:-3] if secure_file.endswith('.gz') else secure_file[:-2]
+            foundit = orbfile_cddis_https(name, year, secure_file, secure_dir)
+            if foundit:
+                break
+        return name, fdir, foundit
+
+    # Still on ftp based downloads
     if not foundit:
         if (mgex == 0):
             if not foundit:
@@ -769,6 +780,33 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
                 store_orbitfile(name,year,'sp3') ; 
 
     return foundit
+
+def orbfile_cddis_https(name, year, filename, directory):
+    """Download a CDDIS orbit using Earthdata credentials from .netrc."""
+    url = 'https://cddis.nasa.gov/archive' + directory + filename
+    print('Searching for ', directory, filename)
+    try:
+        with requests.Session() as session:
+            response = session.get(url, timeout=30)
+            response.raise_for_status()
+            magic = b'\x1f\x8b' if filename.endswith('.gz') else b'\x1f\x9d'
+            if not response.content.startswith(magic):
+                print('CDDIS did not return a compressed orbit. Check Earthdata login.')
+                return False
+            with open(filename, 'wb') as output:
+                output.write(response.content)
+    except requests.RequestException as exc:
+        print('Could not download CDDIS orbit:', exc)
+        return False
+
+    command = 'gunzip' if filename.endswith('.gz') else 'uncompress'
+    result = subprocess.run([command, '-f', filename], check=False)
+    if result.returncode != 0 or not os.path.isfile(name):
+        print('Could not decompress CDDIS orbit:', filename)
+        return False
+
+    orbit_dir = store_orbitfile(name, year, 'sp3')
+    return os.path.isfile(orbit_dir + '/' + name)
 
 def kgpsweek(year, month, day, hour, minute, second):
     """
