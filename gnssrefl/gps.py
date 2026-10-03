@@ -3331,12 +3331,12 @@ def get_orbits_setexe(year,month,day,orbtype):
             if not foundit:
                 f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
     elif (orbtype == 'gnss3') or (orbtype == 'gnss-gfz'):
-        if (year >= 2024):
+        f,orbdir,foundit=gbm_orbits_direct(year,month,day)
+        if not foundit:
+            print('Could not retrieve GFZ rapid orbit; trying GFZ final orbit (BeiDou may be absent).')
             f,orbdir,foundit=newish_gfz_orbits(year,month,day,'final')
-        #else:
-        # try try again?
-        if not foundit :
-            f,orbdir,foundit=gbm_orbits_direct(year,month,day)
+            if not foundit:
+                print('Neither GFZ rapid nor GFZ final orbit could be retrieved.')
     elif (orbtype == 'sp3'):
         #print('uses default IGS orbits, so only GPS ?')
         f,orbdir,foundit=getsp3file_flex(year,month,day,'igs')
@@ -6522,8 +6522,9 @@ def gbm_orbits_direct(year,month,day):
         return_name = littlename
     elif os.path.isfile(fullname + '.gz'):
         subprocess.call(['gunzip', fullname + '.gz'])
-        foundit = True; 
-        return_name = littlename
+        foundit = os.path.isfile(fullname)
+        if foundit:
+            return_name = littlename
 
     if not foundit:
         fullname = fdir + '/' + bigname 
@@ -6532,12 +6533,17 @@ def gbm_orbits_direct(year,month,day):
             return_name = bigname
         elif os.path.isfile(fullname + '.gz'):
             subprocess.call(['gunzip', fullname + '.gz'])
-            foundit = True; 
-            return_name = littlename
+            foundit = os.path.isfile(fullname)
+            if foundit:
+                return_name = bigname
 
     # checked for the first kind of name because that is how it was stored on CDDIS.
     # now use the name as how it is stored at GFZ.  I think
     bigname = bigname2 
+    # Reuse a previously downloaded GFZ rapid orbit.
+    if not foundit and os.path.isfile(fdir + '/' + bigname):
+        foundit = True
+        return_name = bigname
     if not foundit:
         url = gns + littlename + '.Z'
         print(url)
@@ -6555,7 +6561,8 @@ def gbm_orbits_direct(year,month,day):
             try:
                 wget.download(url,bigname + '.gz')
                 subprocess.call(['gunzip', bigname + '.gz'])
-                foundit = True ; return_name = bigname
+                if os.path.isfile(bigname):
+                    foundit = True ; return_name = bigname
             except:
                 okok = 1
 
@@ -7217,7 +7224,6 @@ def newish_gfz_orbits(year,month,day, orbtype):
 
     """
     foundit = False
-    dday2 = 2024 # have to check 
     if day == 0:
         year,month,day = ydoy2ymd(year, month)
 
@@ -7236,26 +7242,23 @@ def newish_gfz_orbits(year,month,day, orbtype):
 
     url2 = new_gns + 'w' + str(wk) + '/' + longname + '.gz'
 
-    if (year + doy/365.25) < dday2:
-        print('For now only searching for GFZ data from 2024 on')
-        print('If this should be changed, submit a pull request')
+    fullname = fdir + '/' + longname
+    if os.path.isfile(fullname):
+        foundit = True
+    elif os.path.isfile(fullname + '.gz'):
+        subprocess.call(['gunzip', fullname + '.gz'])
+        foundit = os.path.isfile(fullname)
     else:
-        fullname = fdir + '/' + longname 
-        if os.path.isfile(fullname):
-            foundit = True
-        elif os.path.isfile(fullname + '.gz'):
-            subprocess.call(['gunzip', fullname + '.gz'])
-            foundit = True
-        else:
-            print('Use the new GFZ ftp site: ', url2)
-            try:
-                wget.download(url2, longname + '.gz')
-                if os.path.isfile(longname + '.gz'):
-                    subprocess.call(['gunzip', longname + '.gz'])
-                    store_orbitfile(longname,year,'sp3') ; 
-                foundit = True
-            except:
-                print('problems downloading GFZ orbit ')
+        print('Trying GFZ final orbit: ', url2)
+        try:
+            wget.download(url2, longname + '.gz')
+            if os.path.isfile(longname + '.gz'):
+                subprocess.call(['gunzip', longname + '.gz'])
+                if os.path.isfile(longname):
+                    store_orbitfile(longname,year,'sp3')
+            foundit = os.path.isfile(fullname)
+        except:
+            print('problems downloading GFZ orbit ')
 
     return longname, fdir, foundit
 

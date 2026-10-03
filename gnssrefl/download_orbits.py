@@ -197,11 +197,12 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                                 filename, fdir, foundit = g.new_ultra_gfz_orbits(year, d-1, 0,hour)
                 elif (pCtr == 'gnss3') or (pCtr == 'gnss-gfz'):
                     # use GFZ ftp site instead of CDDIS
-                    if (year >= 2024):
-                        print('this path to orbits has apparently been removed')
-                        filename, fdir, foundit = g.newish_gfz_orbits(year,month,day, 'final')
+                    filename, fdir, foundit = g.gbm_orbits_direct(year, month, day)
                     if not foundit:
-                        filename, fdir, foundit = g.gbm_orbits_direct(year, month, day)
+                        print('Could not retrieve GFZ rapid orbit; trying GFZ final orbit (BeiDou may be absent).')
+                        filename, fdir, foundit = g.newish_gfz_orbits(year,month,day, 'final')
+                        if not foundit:
+                            print('Neither GFZ rapid nor GFZ final orbit could be retrieved.')
                 elif pCtr == 'gnss2':
                 # use IGN instead of CDDIS
                     print('To my knowledge, this option no longer works')
