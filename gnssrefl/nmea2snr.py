@@ -110,6 +110,7 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
 
     if sp3:
         # means there was no orbit chosen
+        xf = ''; orbdir = ''; foundit = False
         if orb is not None:
             if (orb == 'wum2'):
                 xf,orbdir,foundit = g.get_wuhan_orbits(year,month,day,hour)
@@ -119,6 +120,9 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
                         xf,orbdir,foundit = g.get_wuhan_orbits(year-1,12,31,12)
                     else:
                         xf,orbdir,foundit = g.get_wuhan_orbits(year,doy-1,0,12)
+
+            if orb == 'gbm':
+                xf,orbdir,foundit = g.gbm_orbits_direct(year,month,day)
 
             if orb == 'rapid':
                 print('Try Rapid orbit products from latest directory at GFZ ')
