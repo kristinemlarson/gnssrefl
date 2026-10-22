@@ -100,12 +100,20 @@ def simple_vegetation_filter(station, vxyz, extension='',
 
     # Apply 30-day smoothing to amplitude
     window_len = 30
-    s = np.r_[amp[window_len - 1:0:-1], amp, amp[-2:-window_len - 1:-1]]
-    w = np.ones(window_len, 'd')
-    y = np.convolve(w / w.sum(), s, mode='valid')
-    y0 = int(window_len / 2 - 1)
-    y1 = -int(window_len / 2)
-    smamp = y[y0:y1]
+    half_window_len = window_len // 2
+    mjd = np.array([g.ydoy2mjd(int(yr), int(doy)) for yr, doy in zip(years, doys)])
+    if is_subdaily:
+        mjd += bin_start_hours / 24.0
+
+    # Mirror values and timestamps at both ends to fill the smoothing window edges, as in the daily filter.
+    left_stop = np.searchsorted(mjd, mjd[0] + half_window_len, side='right')
+    right_start = np.searchsorted(mjd, mjd[-1] - half_window_len)
+    s = np.r_[amp[1:left_stop][::-1], amp, amp[right_start:-1][::-1]]
+    padded_mjd = np.r_[2 * mjd[0] - mjd[1:left_stop][::-1], mjd,
+                       2 * mjd[-1] - mjd[right_start:-1][::-1]]
+    starts = np.searchsorted(padded_mjd, mjd - half_window_len)
+    stops = np.searchsorted(padded_mjd, mjd + half_window_len)
+    smamp = np.array([np.mean(s[start:stop]) for start, stop in zip(starts, stops)])
 
     residval = 2  # Residual value for baseline
 
