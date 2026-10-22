@@ -22,6 +22,9 @@ from gnssrefl.utils import str2bool, read_files_in_dir
 from gnssrefl.gnss_frequencies import get_file_suffix, get_signal_label, get_display_label, get_wavelength
 
 
+VEGETATION_MODEL_NAMES = {0: 'none', 1: 'simple', 2: 'advanced'}
+
+
 # Column schemas for the phase files. Writers build header/fmt from these
 # tuples via phase_file_header/phase_file_fmt; readers resolve positions
 # with .index(name) instead of hard-coded integers. Per-day phase files
@@ -457,7 +460,7 @@ def write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset,
                      extension='', vegetation_model=1):
     """
     Write VWC output file in standard gnssrefl format.
-    Works for both vegetation models.
+    Supports all vegetation models.
 
     Parameters
     ----------
@@ -480,7 +483,7 @@ def write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset,
     extension : str, optional
         Extension for file naming (default: '')
     vegetation_model : int, optional
-        1=simple, 2=advanced (for header documentation, default: 1)
+        0=none, 1=simple, 2=advanced (default: 1)
     """
     from gnssrefl.utils import FileManagement
 
@@ -507,10 +510,11 @@ def write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset,
     with open(vwcfile, 'w') as w:
         N = len(vwc_values)
         freq_name = get_display_label(fr)
+        model_name = VEGETATION_MODEL_NAMES[vegetation_model]
 
         w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
         w.write("% Frequency used: {0} \n".format(freq_name))
-        w.write(f"% Vegetation model: {vegetation_model} ({'simple' if vegetation_model == 1 else 'advanced'}) \n")
+        w.write(f"% Vegetation model: {vegetation_model} ({model_name}) \n")
         w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
 
         if is_subdaily:
@@ -564,7 +568,7 @@ def write_rolling_vwc_output(station, vwc_data, fr, bin_hours, extension='', veg
     extension : str, optional
         Extension for file naming (default: '')
     vegetation_model : int, optional
-        1=simple, 2=advanced (for header documentation, default: 2)
+        0=none, 1=simple, 2=advanced (default: 2)
     """
     from gnssrefl.utils import FileManagement
 
@@ -585,10 +589,11 @@ def write_rolling_vwc_output(station, vwc_data, fr, bin_hours, extension='', veg
     with open(vwcfile, 'w') as w:
         N = len(vwc_values)
         freq_name = get_display_label(fr)
+        model_name = VEGETATION_MODEL_NAMES[vegetation_model]
 
         w.write(f"% Soil Moisture Results for GNSS Station {station}\n")
         w.write(f"% Frequency used: {freq_name}\n")
-        w.write(f"% Vegetation model: {vegetation_model} ({'simple' if vegetation_model == 1 else 'advanced'})\n")
+        w.write(f"% Vegetation model: {vegetation_model} ({model_name})\n")
         w.write("% https://github.com/kristinemlarson/gnssrefl\n")
         w.write(f"% Hourly rolling VWC from {bin_hours}-hour windows\n")
         w.write("% FracYr    Year   DOY   VWC Month Day BinStart\n")
@@ -1033,6 +1038,12 @@ def low_pct(amp, basepercent):
         lowval = np.mean(sort_a[0:numx])
 
     return lowval
+
+
+def phase_to_vwc(phase, fr):
+    """Convert phase to percent VWC; currently uses 1.48 percent per degree for all signals."""
+    # Use the nominal L2C sensitivity until signal-specific values are established.
+    return 1.48 * np.asarray(phase)
 
 
 def apply_vwc_leveling(vwc_values, tmin,
@@ -1949,8 +1960,8 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
     if 'vwc_vegetation_model' in station_config:
         vegetation_model = station_config['vwc_vegetation_model']
         # Validate it's an integer model number
-        if not isinstance(vegetation_model, int) or vegetation_model not in [1, 2]:
-            print(f'Warning: vwc_vegetation_model in JSON must be 1 or 2, got {vegetation_model}. Using default (1).')
+        if not isinstance(vegetation_model, int) or vegetation_model not in [0, 1, 2]:
+            print(f'Warning: vwc_vegetation_model in JSON must be 0, 1, or 2, got {vegetation_model}. Using default (1).')
             vegetation_model = 1
     else:
         vegetation_model = 1  # Default to simple model
