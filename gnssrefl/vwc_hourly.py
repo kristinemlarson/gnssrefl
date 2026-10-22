@@ -313,24 +313,24 @@ def vwc_hourly(station: str, year: int, fr: int, year_end: int = None, plt: bool
         sys.exit()
     resolved_fr = int(fr)
 
+    # Get parameters from set_parameters to ensure we have defaults
+    _, tmin, tmax, _, _, year_end, plt, _, _, _, _, _, extension, \
+        _, _, _, level_doys, json_vegetation_model = qp.set_parameters(
+            station, level_doys, None, tmin, tmax, min_req_pts_track,
+            resolved_fr, year, year_end, plt, auto_removal, warning_value, extension,
+            bin_hours, minvalperbin, 0
+        )
+
     if advanced:
         veg_model = 2
     elif vegetation_model is not None:
         veg_model = int(vegetation_model)
     else:
-        veg_model = 1
+        veg_model = json_vegetation_model
 
     # Process based on vegetation model
     if veg_model in (0, 1):
         print(f"Vegetation model {veg_model}: {qp.VEGETATION_MODEL_NAMES[veg_model]}")
-
-        # Get parameters from set_parameters to ensure we have defaults for leveling
-        _, tmin, tmax, _, _, year_end, plt, _, _, _, _, _, extension, \
-            _, _, _, level_doys, _ = qp.set_parameters(
-                station, level_doys, None, tmin, tmax, min_req_pts_track,
-                resolved_fr, year, year_end, plt, auto_removal, warning_value, extension,
-                bin_hours, minvalperbin, 0
-            )
 
         # === PASS 1: Collect unleveled VWC from all offsets ===
         all_vwc_data = []  # Store unleveled results from each offset
@@ -384,14 +384,6 @@ def vwc_hourly(station: str, year: int, fr: int, year_end: int = None, plt: bool
     elif veg_model == 2:
         # Model 2 (advanced)
         print(f"Using efficient model 2 processing with saved track data")
-
-        # Get parameters from set_parameters to ensure we have defaults
-        _, tmin, tmax, _, _, year_end, plt, _, _, _, _, _, extension, \
-            _, _, _, level_doys, _ = qp.set_parameters(
-                station, level_doys, None, tmin, tmax, min_req_pts_track,
-                resolved_fr, year, year_end, plt, auto_removal, warning_value, extension,
-                bin_hours, minvalperbin, 0
-            )
 
         print("=== Generating track data with vwc -save_tracks T ===")
         vwc(station=station, year=year, year_end=year_end, fr=resolved_fr, plt=False, screenstats=False,
