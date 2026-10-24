@@ -52,10 +52,11 @@ def parse_arguments():
                              "file but does not drop any tracks, a second run performs the removal.")
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
     parser.add_argument("-advanced", default=None, type=str, help="Shorthand for -vegetation_model 2 (advanced vegetation model)")
-    parser.add_argument("-vegetation_model", default=None, type=str, help="Vegetation correction model: 1 (simple, default) or 2 (advanced)")
+    parser.add_argument("-vegetation_model", default=None, type=str, help="Vegetation correction model: 0 (none), 1 (simple, default), or 2 (advanced)")
     parser.add_argument("-save_tracks", default=None, type=str, help="Save individual track data")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
-    parser.add_argument("-level_doys", nargs="*", help="doy limits to define level nodes", type=int)
+    parser.add_argument("-seasonal_level", default=None, type=str, help="Apply VWC baseline levelling using the dry-season interval set by -level_doys and a fitted polynomial. Default: T")
+    parser.add_argument("-level_doys", nargs="*", help="Start and end DOY of the dry-season interval used when -seasonal_level T", type=int)
     parser.add_argument("-legacy", default=None, type=str,
                         help="use the legacy GPS-only apriori_RH flow (default False). "
                              "Deprecated; may be removed after 2027-01-01.")
@@ -64,7 +65,7 @@ def parse_arguments():
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt', 'screenstats', 'snow_filter', 'auto_removal', 'hires_figs', 'advanced', 'save_tracks', 'legacy']
+    boolean_args = ['seasonal_level', 'plt', 'screenstats', 'snow_filter', 'auto_removal', 'hires_figs', 'advanced', 'save_tracks', 'legacy']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
@@ -93,7 +94,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = None, plt: bool
         warning_value: float = None, auto_removal: bool = False, hires_figs: bool = False,
         advanced: bool = False, vegetation_model: int = None, save_tracks: bool = False,
         extension: str = None, level_doys: list = [], skip_leveling: bool = False,
-        legacy: bool = False):
+        legacy: bool = False, seasonal_level: bool = True):
     """
     Compute volumetric water content (VWC) from GNSS-IR phase estimates
     across all constellations/frequencies selected during vwc_input.
@@ -176,15 +177,17 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = None, plt: bool
          default value is false
     advanced : bool, optional
          shorthand for vegetation_model=2
+    seasonal_level : bool, optional
+         Apply the annual baseline and tmin offset using the dry-season interval in level_doys. Default True.
     vegetation_model : int, optional
-         vegetation correction model: 1=simple (default), 2=advanced (Chew et al. 2016)
+         vegetation correction model: 0=none, 1=simple (default), 2=advanced (Chew et al. 2016)
          can be set in gnssir analysis JSON as vwc_vegetation_model
     save_tracks : bool, optional
-         save individual track VWC data to files (advanced model only)
+         save individual track VWC data to files
     extension : str
          extension used when you made the json analysis file
     level_doys : list
-         pair of day of years that are used to define time period for "leveling"
+         Start and end DOY of the dry-season interval used when seasonal_level=True.
          default is north american summer
     skip_leveling : bool, optional
          internal use only - skip leveling and return percentage units for unified leveling
@@ -224,7 +227,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = None, plt: bool
     veg_model = None  # Will be finalized from JSON if not set by CLI
     if advanced:
         veg_model = 2
-    elif vegetation_model:
+    elif vegetation_model is not None:
         veg_model = int(vegetation_model)
 
     fs = 10  # fontsize
@@ -244,7 +247,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = None, plt: bool
             tmin=tmin, tmax=tmax, warning_value=warning_value,
             auto_removal=auto_removal, hires_figs=hires_figs, advanced=advanced,
             veg_model=veg_model, save_tracks=save_tracks, extension=extension,
-            level_doys=level_doys, skip_leveling=skip_leveling, colors=colors,
+            level_doys=level_doys, skip_leveling=skip_leveling, seasonal_level=seasonal_level, colors=colors,
             bx=bx, by=by, fs=fs, snow_file=snow_file,
         )
 
@@ -307,7 +310,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = None, plt: bool
         tmin=tmin, tmax=tmax, warning_value=warning_value,
         auto_removal=auto_removal, hires_figs=hires_figs,
         advanced=advanced, veg_model=veg_model, save_tracks=save_tracks,
-        level_doys=level_doys, skip_leveling=skip_leveling,
+        level_doys=level_doys, skip_leveling=skip_leveling, seasonal_level=seasonal_level,
         colors=colors, bx=bx, by=by, fs=fs, snow_file=snow_file,
     )
 
@@ -319,7 +322,7 @@ def process_vwc_from_tracks(
     bin_hours, minvalperbin, bin_offset,
     snow_filter, tmin, tmax, warning_value, auto_removal,
     hires_figs, advanced, veg_model, save_tracks,
-    level_doys, skip_leveling, colors, bx, by, fs, snow_file,
+    level_doys, skip_leveling, colors, bx, by, fs, snow_file, seasonal_level=True,
 ):
     """Run the shared VWC pipeline on a prepared tracks array.
 
@@ -352,9 +355,11 @@ def process_vwc_from_tracks(
 
     if veg_model is None:
         veg_model = json_vegetation_model
-    if veg_model not in [1, 2]:
-        print(f'Vegetation model {veg_model} is not supported. Use 1 (simple) or 2 (advanced). Exiting.')
-        sys.exit()
+
+    veg_model = int(veg_model)
+
+    if veg_model not in [0, 1, 2]:
+        raise ValueError("vegetation_model must be 0, 1, or 2")
     if veg_model == 2:
         advanced = True
     if veg_model != json_vegetation_model:
@@ -704,7 +709,17 @@ def process_vwc_from_tracks(
     # advanced_vegetation_filter(), then passed to leveling and output functions.
     # ========================================================================
 
-    if veg_model == 1:
+    if veg_model == 0:
+        print('No vegetation correction (model 0).')
+        avg_phase = qp.calculate_avg_phase(vxyz, bin_hours, bin_offset, minvalperbin)
+        if len(avg_phase) == 0:
+            print('No averaged phase data could be calculated - perhaps minvalperbin is too stringent')
+            sys.exit()
+        vwc_values = qp.phase_to_vwc(avg_phase[:, 2], fr)
+        vwc_data = svc.build_vwc_data(avg_phase, vwc_values)
+        if save_tracks:
+            svc.save_individual_track_data(station, vxyz, extension, fr)
+    elif veg_model == 1:
         print('Running simple vegetation model (model 1)...')
         vwc_data = svc.simple_vegetation_filter(
             station, vxyz, extension,
@@ -718,8 +733,7 @@ def process_vwc_from_tracks(
             bin_hours, bin_offset, plt, fr, minvalperbin,
             save_tracks)
     else:
-        print(f'Unknown vegetation model: {veg_model}. Use 1 (simple) or 2 (advanced).')
-        sys.exit()
+        raise ValueError("vegetation_model must be 0, 1, or 2")
 
     # Check if vegetation correction produced results
     if not vwc_data or len(vwc_data.get('vwc', [])) == 0:
@@ -732,15 +746,18 @@ def process_vwc_from_tracks(
         return vwc_data  # vwc_data['vwc'] is in PERCENTAGE units (0-60)
 
     # Apply baseline leveling
-    print('\nApplying baseline leveling...')
-    leveled_vwc, leveling_info = qp.apply_vwc_leveling(
-        vwc_data['vwc'], tmin,
-        mjd=vwc_data['mjd'],
-        level_doys=level_doys,
-        polyorder=polyorder,
-        station=station, plot_debug=plt, plt2screen=plt,
-        extension=extension, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
-    )
+    if seasonal_level:
+        print('\nApplying baseline leveling...')
+        leveled_vwc, leveling_info = qp.apply_vwc_leveling(
+            vwc_data['vwc'], tmin,
+            mjd=vwc_data['mjd'],
+            level_doys=level_doys,
+            polyorder=polyorder,
+            station=station, plot_debug=plt, plt2screen=plt,
+            extension=extension, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
+        )
+    else:
+        leveled_vwc = np.asarray(vwc_data['vwc']) / 100
 
     # Update vwc_data with leveled values
     vwc_data['vwc'] = leveled_vwc if isinstance(leveled_vwc, list) else leveled_vwc.tolist()
@@ -769,7 +786,7 @@ def vwc_legacy(station, year, year_end, fr, plt, screenstats, min_req_pts_track,
                polyorder, minvalperday, bin_hours, minvalperbin, bin_offset,
                snow_filter, tmin, tmax, warning_value, auto_removal,
                hires_figs, advanced, veg_model, save_tracks, extension,
-               level_doys, skip_leveling, colors, bx, by, fs, snow_file):
+               level_doys, skip_leveling, colors, bx, by, fs, snow_file, seasonal_level=True):
     """Legacy GPS-only VWC flow.
 
     Reads apriori_rh_{fr}.txt (the legacy per-freq track list), then
@@ -796,7 +813,7 @@ def vwc_legacy(station, year, year_end, fr, plt, screenstats, min_req_pts_track,
         tmin=tmin, tmax=tmax, warning_value=warning_value,
         auto_removal=auto_removal, hires_figs=hires_figs,
         advanced=advanced, veg_model=veg_model, save_tracks=save_tracks,
-        level_doys=level_doys, skip_leveling=skip_leveling,
+        level_doys=level_doys, skip_leveling=skip_leveling, seasonal_level=seasonal_level,
         colors=colors, bx=bx, by=by, fs=fs, snow_file=snow_file,
     )
 
