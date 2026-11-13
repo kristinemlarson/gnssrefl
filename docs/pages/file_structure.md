@@ -319,7 +319,7 @@ gnssrefl uses numbers for the frequencies that are defined in the RINEX files:
 - 201, 205, 206, 207, 208 are Galileo frequencies, which are
 set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
 
-- 302, 306, 307 are Beidou frequencies, defined as 1561.098, 1207.14, 1268.52 MHz
+- 302, 306, 307 are Beidou frequencies, defined as 1561.098, 1268.52, 1207.14 MHz
 
 This means that if you want the Beidou frequency data from 1561.098, you need to look in the "L2" column.
 If you want the 1278.70 Galileo frequency, you need to look in the "L6" column.
