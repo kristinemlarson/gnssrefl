@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 4.3.0
+
+I've made some pretty big changes to invsnr. So documentation to follow.
+
+Fixed numerous bugs in download_tides (which no one had told me about!)
+
+This also officially includes some of George's recent PR.
+
 
 ## 4.2.3
 

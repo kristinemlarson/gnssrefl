@@ -255,6 +255,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             snr = station_config['snr']
             if not par or par <= 1:
                 print('Found a snr choice in the json:', snr)
+
+    # I do not understand why this if statement produces this print statement!
     if not par or par <= 1:
         print('Using snr file type: ', snr)
 

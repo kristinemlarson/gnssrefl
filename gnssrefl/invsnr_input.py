@@ -33,6 +33,8 @@ def parse_arguments():
     parser.add_argument("-lat", help="Latitude (degrees)", type=str, default=None)
     parser.add_argument("-lon", help="Longitude (degrees)", type=str, default=None)
     parser.add_argument("-height", help="Ellipsoidal height (meters)", type=str, default=None)
+    parser.add_argument("-knot_space", help="Knot spacing in hours ", type=float, default=3.0)
+    parser.add_argument("-threedays", help="Doing a 3 day run", type=str, default=None)
 # these are the optional inputs 
     args = parser.parse_args().__dict__
 
@@ -41,7 +43,8 @@ def parse_arguments():
 
 
 def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=15, azim1: float = 0,
-                 azim2: float = 360, lat: float = None, lon: float = None, height: float = None, peak2noise: float=3):
+                 azim2: float = 360, lat: float = None, lon: float = None, height: float = None, 
+                 peak2noise: float=3, knot_space=3.0, threedays=False):
     """
     Sets some of the analysis parameters for invnsr. Values are stored in a json in $REFL_CODE/input
     Note: this code was written independently of gnssrefl. The Quality Control parametesr are thus quite 
@@ -80,6 +83,11 @@ def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=
         Ellipsoidal height (meters)
     peak2noise : float, optional
         peak to noise 
+    knot_space : float, optional
+        how often are knots estimated (hours) 
+    threedays : bool, optional
+        whether you plan to use a three-day run
+        i.e. the day before and after the one you really want.
 
     """
 
@@ -123,6 +131,9 @@ def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=
     station_config['rhlims'] = [h1, h2]
     station_config['elvlims'] = [e1, e2]
     station_config['azilims'] = [a1, a2]
+    station_config['knot_space'] = knot_space 
+    station_config['threedays'] = threedays  
+
     # use david's naming convention for this
     station_config['pktnlim'] = peak2noise
 

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gnssrefl"
-version = "4.2.3"
+version = "4.3.0"
 description = "A GNSS reflectometry software package "
 readme = "README.md"
 maintainers = [
@@ -14,7 +14,6 @@ maintainers = [
 requires-python = ">=3.10,<4"
 classifiers = [
     "Programming Language :: Python :: 3.10",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 ]
 dependencies = [
     "numpy>=2.0",
@@ -84,3 +83,4 @@ max_resolve_RH = "gnssrefl.max_resolve_RH_cl:main"
 pickle_dilemma = "gnssrefl.pickle_dilemma:main"
 mjd = "gnssrefl.mjd:main"
 make_meta = "gnssrefl.make_meta:main"
+invsnr_merge = "gnssrefl.invsnr_merge:main"

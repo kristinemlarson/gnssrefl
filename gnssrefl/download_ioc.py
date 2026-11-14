@@ -57,6 +57,11 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     if (date1[0:4] != date2[0:4]):
         print('This code does not collect data across different years.'); sys.exit()
 
+    # IOC wants the dashs in them
+    xdate1 = date1[0:4] + '-' + date1[4:6] + '-' + date1[6:8]
+    xdate2 = date2[0:4] + '-' + date2[4:6] + '-' + date2[6:8]
+    print('start',date1,'stop', date2)
+
     g.check_environ_variables()
 
     xdir = os.environ['REFL_CODE']
@@ -86,13 +91,12 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         if output[-3:] == 'csv':
             csv = True
 
-    print('WARNING: as of 2023 March 28 the output file format has changed')
     month1 = int(date1[4:6])
     month2 = int(date2[4:6])
     year = int(date1[0:4])
 
     if (month1 == month2):
-        newurl = url1 + station + '&timestart=' + date1 + '&timestop=' + date2 + url2
+        newurl = url1 + station + '&timestart=' + xdate1 + '&timestop=' + xdate2 + url2
         print(newurl)
         try:
             data = requests.get(newurl).json()
@@ -225,15 +229,15 @@ def find_start_stop(year,m):
     """
     cyyyy = str(year)
     cmm = '{:02d}'.format(m)
-    d1 = cyyyy + cmm + '01'
+    d1 = cyyyy + '-' + cmm + '-' + '01'
     # IOC if you ask for data thru nov30, it stops at midnite nov29,
     # which is not what NOAA does - 
 
     if m == 12:
-        d2 = str(year+1) +  '0101'
+        d2 = str(year+1) +  '-' + '01' + '-' + '01'
     else:
         cmm = '{:02d}'.format(m+1)
-        d2 = cyyyy + cmm + '01'
+        d2 = cyyyy + '-' + cmm + '-' + '01'
 
     return d1, d2
 

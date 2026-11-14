@@ -1,8 +1,12 @@
-# gnssrefl v4.2.3
+# gnssrefl v4.3.0
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 
 **News**
+
+* fixed bugs in download_tides
+
+* added threedays option to invsnr and invsnr_merge to help people automate usage of invsnr.
 
 * added new orbit source (repro3, which is multi-GNSS GFZ, useful for older data?)
 

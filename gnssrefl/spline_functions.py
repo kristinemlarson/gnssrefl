@@ -306,7 +306,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
         detrended SNR data for inverse analysis
 
     """
-    print('screen stats', screenstats)
+    #print('screen stats', screenstats)
     # get a list for late ron
     if 'l2c_only' in kwargs:
         l2c_only = kwargs.get('l2c_only')
@@ -342,16 +342,16 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     if 'G' not in satconsts:
         nogps = snrdata[:, 0] > 100
         snrdata = snrdata[nogps]
-        print('Num of obs after GPS removal', len(snrdata))
+        print('Number of obs after GPS removal', len(snrdata))
 
     if 'R' not in satconsts:
         noglo = np.logical_or(snrdata[:, 0] < 100, snrdata[:, 0] > 200)
         snrdata = snrdata[noglo]
-        print('Num of obs after Glonass removal', len(snrdata))
+        print('Number of obs after Glonass removal', len(snrdata))
     if 'E' not in satconsts:
         nogal = np.logical_or(snrdata[:, 0] < 200, snrdata[:, 0] > 300)
         snrdata = snrdata[nogal]
-        print('Num of obs after Galileo removal', len(snrdata))
+        print('Number of obs after Galileo removal', len(snrdata))
     if 'C' not in satconsts:
         nogal = np.logical_or(snrdata[:, 0] < 300, snrdata[:, 0] > 400)
         snrdata = snrdata[nogal]
@@ -398,7 +398,11 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     # initialize values?
     kristine_dictionary(alld,'','')
 
-    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/'
+    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + str(year) + '/'
+    if not os.path.isdir(xdir):
+        print('make output directory for files')
+        subprocess.call(['mkdir','-p', xdir])
+
 
     print('invsnr lsp results written to :', xdir + 'my_lsp.txt')
     fout = open(xdir + 'my_lsp.txt', 'w+')
@@ -477,6 +481,10 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                     else:
                         sind = bkpt[ii - 1] + 1
                     eind = bkpt[ii] + 1
+
+                    # KL I disagree with how this is programmed.  If you are skipping an
+                    # arc, you should skip an arc. You should not continue on and compute
+                    # a lomb scargle for it. Bu I do not have time for this.
                     if eind - sind < 20:
                         #print('arc not big enough')
                         # should this really be continue?
@@ -496,6 +504,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                 # estimating the periodogram used to compute the dominant reflector 
                 # frequency, and thus RH
                     snrdt = snrt - p(sinelvt)
+
                     pgram = LombScargle(sinelvt, snrdt, normalization='psd').power(f)
                     pgram = 2 * np.sqrt(pgram/len(sinelvt))
                 # converting it into the proper units of RH (meters)
@@ -725,6 +734,8 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
     satconsts: default use all given, otherwise specify from ['G', 'R', 'E'] (gps / glonass / galileo)
 
+    threedays : bool
+        whether you want to do a three day run centered on doy
     Returns
     -------
     invout: dictionary 
@@ -744,7 +755,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         # this should be the correct date if you want a better model 
         dmjd = 59580 # fake number
         p,T,irefr,humidity, Tm, lapse_rate = set_refraction_model(station, dmjd,station_config,imodel)
-        #print('refraction parameters ', p,T,humidity,irefr)
+        print('refraction parameters ', p,T,humidity,irefr)
 
     if 'rough_in' in kwargs:
         rough_in  = kwargs.get('rough_in')
@@ -777,33 +788,65 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     if 'snr_ending' in kwargs:
         snr_ending = kwargs.get('snr_ending')
     
+    threedays = False
+    if 'threedays' in kwargs:
+        threedays = kwargs.get('threedays')
+
     if 'doy_end' in kwargs:
         doy_end = kwargs.get('doy_end')
     else:
         doy_end = doy
 
-
-    if (doy == doy_end):
-        print('Only doing one day')
-        snrfile, snrdir, stryear, strdoy = define_inputfile(station,year,doy,snr_ending)
-        snrdata = readklsnrtxt(snrfile, snrdir,signal)
-        numdays = 1
+    if 'outfile_type' in kwargs:
+        outfile_type = kwargs.get('outfile_type')
     else:
-        numdays = doy_end - doy + 1
-        for d in range(doy, doy_end+1):
-            snrfile, snrdir, stryear_temp, strdoy_temp = define_inputfile(station,year,d,snr_ending)
-            snrtemp = readklsnrtxt(snrfile, snrdir,signal)
-            if d == doy:
-                snrdata = snrtemp
-                # save these
-                stryear = stryear_temp
-                strdoy = strdoy_temp
+        outfile_type =  'txt'
+
+    if 'outfile_name' in kwargs:
+        outfile_name = kwargs.get('outfile_name')
+        if len(outfile_name) == 0:
+            outfile_name = station + '_invsnr.txt'
+
+    # change so define_intputfile returns whether file exists.  no longer exit if one file is missing,
+    # except for when you only asked for one.
+    snrdata = []
+    if (doy == doy_end):
+        snrfile, snrdir, stryear, strdoy,fileexist = define_inputfile(station,year,doy,snr_ending)
+        if threedays: 
+            snrdata, stryear, strdoy, numdays= pickup_3days(station,year,doy,signal,snr_ending) 
+            fileexist = True # since it will exit if not found
+        else:
+            if fileexist:
+                snrdata = readklsnrtxt(snrfile, snrdir,signal)
+                numdays = 1
             else:
-                snrdata = np.vstack((snrdata, snrtemp))
+                print('You asked for one day and that SNR file does not exist')
+                sys.exit()
+    else:
+        snrdata = []
+        numdays = doy_end - doy + 1
+        startMergedFile = True 
+        for d in range(doy, doy_end+1):
+            # this does not go over the end of year ... or over beginning of year either..
+            snrfile, snrdir, stryear_temp, strdoy_temp,fileexist = define_inputfile(station,year,daybefore,snr_ending)
+
+            if fileexist:
+                snrtemp = readklsnrtxt(snrfile, snrdir,signal)
+                if startMergedFile:
+                    snrdata = snrtemp
+                    stryear = stryear_temp
+                    strdoy = strdoy_temp
+                    startMergedFile = False
+                else:
+                    snrdata = np.vstack((snrdata, snrtemp))
+
+        if len(snrdata) == 0:
+            print('No SNR data found. Exiting') 
+            sys.exit()
 
     # set output directory here
     g.set_subdir(station)
-    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/'
+    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + str(year) + '/'
 
 
     nr,nc = snrdata.shape
@@ -841,7 +884,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     #print('Sorting snr data into arcs')
 
     # arguments sent directly
-    print('Begin Lomb Scargle analysis')
+    #print('Begin Lomb Scargle analysis')
     s1=time.time()
     rh_arr, snrdt_arr, fspecdict= snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year, doy, signal=signal,**kwargs)
     # should already exist
@@ -850,7 +893,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     #    print('make output directory for file')
     #    subprocess.call(['mkdir',xdir])
     s2=time.time()
-    print('Time spent: ',round(s2-s1,2), ' seconds')
+    #print('Time spent: ',round(s2-s1,2), ' seconds')
     #print(fspecdict)
     print('Found ' + str(np.ma.size(rh_arr, axis=0)) + ' arcs')
     if screenstats:
@@ -900,8 +943,9 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     def residuals_spectral_ls(kval):
         residuals = residuals_cubspl_spectral(kval, knots, rh_arr)
         return residuals
+    #print('Fitting a cubic spline to the periodogram arcs. KEEP in MIND, this does not include rhdot.')
+    #print('If you want to do the periodogram approach, use the subdaily method.')
 
-    print('Now fitting a cubic spline to the arcs, but DP does not include rhdot')
     kval_0 = np.nanmean(rh_arr[:, 1]) * np.ones(len(knots))
     #print('Number of knots used in ', len(knots))
     s1=time.time()
@@ -911,15 +955,15 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     invout['knots'] = knots
     invout['kval_spectral'] = kval_spectral[1:-1]  # dont save first and last points
     s2=time.time()
-    print('Fitting spline to LSP results took ', round(s2-s1,2), ' seconds')
-    print('satellite constellations ', satconsts)
+    #print('Fitting spline to LSP results took ', round(s2-s1,2), ' seconds')
+    print('Requested satellite constellations ', satconsts)
     if snrfit:
         s1=time.time()
         #print('Now doing Joakim Strandberg SNR fitting inversion')
         kval_0 = kval_spectral
         #print('kval_0', kval_0) dont need to print htis out
         final_list, Nfreq = smarterWay(fspecdict)
-        print(final_list)
+        print('Found frequencies ', final_list)
         #print('Number of constellation specific frequencies', Nfreq)
         # consts = len(satconsts)
         #kval_0 = np.append(kval_0, np.zeros(consts * 2))
@@ -948,12 +992,6 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         delta_out = 300 # seconds
         if 'delta_out' in kwargs:
             delta_out = int(kwargs.get('delta_out'))
-        outfile_type= 'txt'
-        if 'outfile_type' in kwargs:
-            outfile_type = kwargs.get('outfile_type')
-        outfile_name= ''
-        if 'outfile_name' in kwargs:
-            outfile_name = kwargs.get('outfile_name')
         #plotdt = 5 * 60
         plotdt = delta_out # make it so people can change it
         #tplot = np.linspace(gbase, gbase + numdays*86400, int(86400/plotdt + 1))
@@ -998,8 +1036,23 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
             spl_at_lsp = cubspl_f(Xres)
             ab = rh_arr
 
+            # this is what is stored in the arrays
+            # temp_arr[0, 1] = reflh_sub[maxind]                                      # reflector height (meters)
+            # temp_arr[0, 2] = sat                                                    # sat prn
+            # temp_arr[0, 3] = np.tan(np.mean(elvt) / 180 * np.pi) / dthdt            # tane / (de/dt)
+            # temp_arr[0, 4] = np.min(elvt)                                           # min elv (deg)
+            # temp_arr[0, 5] = np.max(elvt)                                           # max elv (deg)
+            # temp_arr[0, 6] = np.mean(azit)                                          # mean azimuth (deg)
+            # temp_arr[0, 7] = np.max(pgram_sub)                                      # peak of lsp
+            # temp_arr[0, 8] = np.var(snrdt)                                          # variance of lsp
+            # temp_arr[0, 9] = datet[-1] - datet[0]                                   # length (in time) of arc (seconds?)
+            # temp_arr[0, 10] = pktn                                                  # peak-to-noise ratio
+            # temp_arr[0, 11] = isignal                                               # frequency, integer
+
             print('invsnr lsp outliers written to : ', xdir + 'outliers_lsp.txt')
             iiout = open(xdir + 'outliers_lsp.txt', 'w+')
+            iiout.write("% outlier(m), sat, azimuth, peak2n \n")
+            iiout.write("% (1)         (2)   (3),    (4) \n")
             for ijk in range(0,len(rh_arr)):
                 dd =  rh_arr[ijk,1]-spl_at_lsp[ijk]
                 if (abs(dd) > outlier_limit):
@@ -1027,7 +1080,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
                         d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS, lsp_per_hour[whichhour]))
                 else:
                     iout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:2.0f},{6:8.3f},{7:3.0f},{8:13.6f},{9:3.0f}\n".format(y, m, 
-                        d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS),lsp_per_hour[whichhour])
+                        d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS, lsp_per_hour[whichhour]))
             pjs, = plt.plot(tplot_dn, rh_js_plot, '-',color='black')
             pjs.set_label('invmod')
             iout.close()
@@ -1047,7 +1100,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         ax.grid(True)
         ax.set_ylabel('RH meters')
         ax.invert_yaxis()
-        spng = str(os.environ['REFL_CODE']) + '/Files/' + station + '/' + 'spline_out.png'
+        spng = str(os.environ['REFL_CODE']) + '/Files/' + station + '/invsnr/' + str(year) + '/spline_out.png'
         print('Plot with results has been written to ', spng)
         plt.savefig(spng)
         if doplot:
@@ -1087,29 +1140,23 @@ def invsnr_header(xdir, outfile_type,station,outfile_name):
         if you write out special files, they go in the working directory
 
     """
+
+    commentl = '%' # for now ... 
     if outfile_type == 'txt':
         usetxt = True; 
-        if (len(outfile_name) == 0):
-            ioutputfile= xdir + station + '_invsnr.txt'
-        else:
-            ioutputfile= outfile_name + '.txt'
-
-        iout = open(ioutputfile, 'w+')
-        commentl = '%' # for now ... 
     else:
         usetxt = False; 
-        if (len(outfile_name) == 0):
-            ioutputfile= xdir + station + '_invsnr.csv'
-        else:
-            ioutputfile= outfile_name + '.csv'
 
-        iout = open(ioutputfile, 'w+')
-        commentl = '%'
+    ioutputfile= xdir + outfile_name 
+
+
     print('invsnr output will be written to: ', ioutputfile)
+    iout = open(ioutputfile, 'w+')
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     iout.write('{0:s} Results for {1:4s} calculated on {2:20s} \n'.format(commentl,  station, xxx ))
     iout.write('{0:s} gnssrefl, https://github.com/kristinemlarson \n'.format(commentl))
-    iout.write('{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD  Nretrievals\n'.format(commentl))
+    iout.write('{0:s} YYYY  MM  DD  HH  MM  SS   RH(m) doy  MJD  Nretrievals\n'.format(commentl))
+    iout.write('{0:s}  (1) (2)  (3) (4) (5) (6)  (7)   (8)  (9)  (10) \n'.format(commentl))
 
     return iout, usetxt
 
@@ -1121,10 +1168,9 @@ def define_inputfile(station,year,doy,snr_ending):
     station : str
         4 ch name of station 
     year : integer
-
+        full year
     doy : int
         day of year 
-
     snr_ending : int
         file ending, e.g. 66, 99
 
@@ -1132,13 +1178,10 @@ def define_inputfile(station,year,doy,snr_ending):
     -------
     snrfile: str
         name of snrfile 
-
     snrdir : str
         name of output directory
-
     cyyyy : str
         four character year
-
     cdoy : str
         three character day of year
     """
@@ -1151,6 +1194,7 @@ def define_inputfile(station,year,doy,snr_ending):
     gzfile = xdir + snrfile + '.gz'
     xzfile = xdir + snrfile + '.xz'
     snrdir = ''
+    fileexist = True
     if not os.path.isfile(snrfile):
         #print('SNR file does not exist in the local directory')
         if os.path.isfile(xdir + snrfile):
@@ -1168,10 +1212,10 @@ def define_inputfile(station,year,doy,snr_ending):
             subprocess.call(['unxz',xzfile])
             snrdir = xdir
         else:
-            print(snrfile, ' not found. Exiting')
-            sys.exit()
+            print(snrfile, ' not found. ')
+            fileexist = False
 
-    return snrfile,snrdir, cyyyy, cdoy
+    return snrfile,snrdir, cyyyy, cdoy, fileexist
 
 def arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,azdesc,xsignal):
     """
@@ -1679,3 +1723,93 @@ def set_refraction_model(station, dmjd, station_config, imodel):
         #print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
 
     return p,T,irefr, e, Tm, la
+
+def pickup_3days(station,year,doy,signal,snr_ending):
+    """
+    Parameters
+    ----------
+    station : str
+        4 char name
+    doy : int
+        day of year
+    year : int
+        full calendar year
+    snr_ending : int
+        what it sounds like
+
+    Returns
+    -------
+    """
+    snrdata = []
+    numdays = 0 
+    # check the day in the middle
+    snrfile, snrdir, stryear_temp, strdoy_temp,fileexist = define_inputfile(station,year,doy,snr_ending)
+    if not fileexist :
+        print('No SNR data found. Exiting') 
+        sys.exit()
+
+    startMergedFile = True 
+    for d in range(doy-1, doy+2):
+        dec31 = g.dec31(year)
+        if (d == 0): 
+            print('Using the last day of previous year')
+            daybefore = g.dec31(year-1)
+            snrfile, snrdir, stryear_temp, strdoy_temp,fileexist = define_inputfile(station,year-1,daybefore,snr_ending)
+        elif ( d > dec31 ) :
+            print('Using the first day from the next year')
+            dayafter = 1 
+            snrfile, snrdir, stryear_temp, strdoy_temp,fileexist = define_inputfile(station,year+1,dayafter,snr_ending)
+        else:
+            snrfile, snrdir, stryear_temp, strdoy_temp,fileexist = define_inputfile(station,year,d,snr_ending)
+
+        if fileexist:
+            numdays = numdays + 1
+            snrtemp = readklsnrtxt(snrfile, snrdir,signal)
+            if startMergedFile:
+                snrdata = snrtemp
+                stryear = stryear_temp
+                strdoy = strdoy_temp
+                startMergedFile = False
+            else:
+                snrdata = np.vstack((snrdata, snrtemp))
+
+    if len(snrdata) == 0:
+        # maybe return instead?
+       print('No SNR data found. Exiting') 
+       sys.exit()
+
+    return snrdata, stryear, strdoy, numdays
+
+def invmerge(station, year, doy1, doy2, screen):
+    """
+    Parameters
+    ----------
+    station : str
+        4 character station name
+
+    year : int
+        full year
+
+    doy1 : int
+
+    doy2 : int
+
+    screen : bool
+
+    """
+    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/'
+    cyear = str(year)
+    if doy1 is None:
+        doy1 = 1
+    dec31 = g.dec31(year)
+    if doy2 is None:
+        doy2 = dec31
+
+    mjd, rh,all_lines = read_invfile(station,year,doy1,doy2)
+
+    outfile = xdir + 'merge_' + station + '_' + cyear + '.txt'
+    print('merged output goes to \n', outfile)
+    head = getheader(station)
+    fmt = '%4.0f %2.0f %2.0f %2.0f %2.0f %2.0f %8.3f %3.0f %13.6f %2.0f'
+    # use this instead
+    np.savetxt(outfile, all_lines, fmt=fmt, delimiter=' ', newline='\n',header=head, comments='%')
