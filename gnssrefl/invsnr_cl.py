@@ -25,7 +25,7 @@ def parse_arguments():
     parser.add_argument("-dec", default=None, type=int, help="SNR file decimator (seconds)")
     parser.add_argument("-polydeg", default=None, type=int, help="polynomial degree for direct signal removal (default is 2)")
     parser.add_argument("-snrfit", default=None, type=str, help="Do invsnr fit? True is the default ")
-    parser.add_argument("-plt", default=None, type=str, help="Plot to the screen?  default is True")
+    parser.add_argument("-plt", default=None, type=str, help="Plot to the screen?  default is False")
     parser.add_argument("-doy_end", default=None, type=str, help="day of year to end analysis")
     parser.add_argument("-lspfigs", default=None, type=str, help="Make LSP plots, default False.")
     parser.add_argument("-snrfigs", default=None, type=str, help="Make SNR plots, default False.")
@@ -54,7 +54,7 @@ def parse_arguments():
 
 
 def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2.5, constel: str = None, 
-        screenstats: bool = False, dec: int = 1, polydeg: int = 2, snrfit: bool = True, plt: bool = True,
+        screenstats: bool = False, dec: int = 1, polydeg: int = 2, snrfit: bool = True, plt: bool = False,
         doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: float = 3, 
         rough_in: float = 0.1, risky: bool = False, snr: int = 66, 
         outfile_name: str = '', outlier_limit: float = 0.5, no_dots: bool = False, delta_out: int = 300, 
