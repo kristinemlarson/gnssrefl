@@ -41,6 +41,7 @@ def parse_arguments():
     parser.add_argument("-json_override", default=None, type=str, help="bool, Override json file name")
     parser.add_argument("-lastday_seconds", default=None, type=int, help="this option currently does not work")
     parser.add_argument("-threedays", default=None, type=str, help="bool, use 3 days centered on input doy")
+    parser.add_argument("-doy3end", default=None, type=int, help="threedays option only, allows multi-doy runs")
 
     args = parser.parse_args().__dict__
 
@@ -57,7 +58,8 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
         doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: float = 3, 
         rough_in: float = 0.1, risky: bool = False, snr: int = 66, 
         outfile_name: str = '', outlier_limit: float = 0.5, no_dots: bool = False, delta_out: int = 300, 
-           refraction: bool = True, json_override: bool = False, lastday_seconds: int=0, threedays: bool=False):
+           refraction: bool = True, json_override: bool = False, lastday_seconds: int=0, 
+           threedays: bool=False, doy3end: int=None):
     """
     You must have run invsnr_input before using this code. This is the wrapper code that does the 
     invsnr modelling. Note: outfile_name and outfile_type are unnecessary. Consolidate them.
@@ -297,19 +299,30 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
     outfile_type =  'txt'
     if len(outfile_name) > 0:
         outfile_type = outfile_name[-3::]
+
+
     if threedays:
-        cdoy = '{:03d}'.format(doy)
-        outfile_name = cdoy + '.txt'
+        if doy3end  is None:
+            doy3end = doy
+        for d in range(doy, doy3end+1):
+            cdoy = '{:03d}'.format(d)
+            outfile = cdoy + '.txt'
+            spline_functions.snr2spline(station, year, d, azilims, elvlims, rhlims, precision, kdt, signal=signal, 
+                                        lspfigs=lspfigs, snrfigs=snrfigs, snrfit=snrfit, doplot=plt, pktnlim=peak2noise, 
+                                        satconsts=satconsts, screenstats=screenstats, tempres=dec, doy_end=d, 
+                                        l2c_only=l2c_only, rough_in=rough_in, risky=risky, snr_ending=snr, 
+                                        outfile_name=outfile, outfile_type=outfile_type, delta_out=delta_out, 
+                                        station_config=station_config, outlier_limit=outlier_limit, no_dots=no_dots,
+                                        lastday_seconds=lastday_seconds,threedays=threedays)
 
-    #print('Using outfile_type of ', outfile_type, ' and ', outfile_name)
-
-    spline_functions.snr2spline(station, year, doy, azilims, elvlims, rhlims, precision, kdt, signal=signal,
-                                lspfigs=lspfigs, snrfigs=snrfigs, snrfit=snrfit, doplot=plt, pktnlim=peak2noise,
-                                satconsts=satconsts, screenstats=screenstats, tempres=dec, doy_end=doy_end,
-                                l2c_only=l2c_only, rough_in=rough_in, risky=risky, snr_ending=snr,
-                                outfile_name=outfile_name, outfile_type=outfile_type, delta_out=delta_out, 
-                                station_config=station_config, outlier_limit=outlier_limit, 
-                                no_dots=no_dots,lastday_seconds=lastday_seconds,threedays=threedays)
+    else:
+        spline_functions.snr2spline(station, year, doy, azilims, elvlims, rhlims, precision, kdt, signal=signal, 
+                                    lspfigs=lspfigs, snrfigs=snrfigs, snrfit=snrfit, doplot=plt, pktnlim=peak2noise, 
+                                    satconsts=satconsts, screenstats=screenstats, tempres=dec, doy_end=doy_end, 
+                                    l2c_only=l2c_only, rough_in=rough_in, risky=risky, snr_ending=snr, 
+                                    outfile_name=outfile_name, outfile_type=outfile_type, delta_out=delta_out, 
+                                    station_config=station_config, outlier_limit=outlier_limit, no_dots=no_dots,
+                                    lastday_seconds=lastday_seconds,threedays=threedays)
     s2=time.time()
     print('Takes ', np.round(s2-s1,2), ' seconds')
     print('PAY ATTENTION: I moved where the outputs are written to. Check the screen output.')

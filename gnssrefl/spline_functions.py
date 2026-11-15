@@ -359,7 +359,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
 
     # apply elevation and azimuth restrictions.   
     # KL: we usually do the DC first and then apply the restrictions DC  
-    print('Apply elevation angle filter: ', elvlims[0], elvlims[1])
+    #print('Apply elevation angle filter: ', elvlims[0], elvlims[1])
     tfilter = np.logical_and(snrdata[:, 1] > elvlims[0], snrdata[:, 1] < elvlims[1])
     snrdata = snrdata[tfilter]
     if azilims[0] < azilims[1]:
@@ -367,7 +367,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     else:
         tfilter = np.logical_or(snrdata[:, 2] > azilims[0], snrdata[:, 2] < azilims[1])
     snrdata = snrdata[tfilter]
-    print('Apply azimuth angle filter: ', azilims[0], azilims[1])
+    #print('Apply azimuth angle filter: ', azilims[0], azilims[1])
 
     #print('Using Lomb Scargle precision of ', precision, ' m')
     # setting up arrays for the output of the LSP
