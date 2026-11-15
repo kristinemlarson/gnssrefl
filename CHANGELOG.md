@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## 4.3.0
 
 I've made some pretty big changes to invsnr. So documentation to follow.
+[Try here](https://gnssrefl.readthedocs.io/en/latest/pages/README_invsnr.html)
 
 Fixed numerous bugs in download_tides (which no one had told me about!)
 

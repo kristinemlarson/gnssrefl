@@ -12,6 +12,36 @@ This code uses the LSP results as a starting solution - the quality control appl
 is entirely different than what was used in <code>gnssir</code>. Since the point of this code is to estimate smoothly
 varying sea level, I don't think we need to make the LSP portion of it a clone of <code>gnssir</code>. 
 
+November 15, 2026
+
+Changes:
+
+knot_space is no longer an integer, so you can do 1.5, 2.5 etc.
+
+to help people that wnat to generate longer time series, I have implemented a method
+to do overlapping three day analyses.  When merging them, it throws out the first and third
+day and keeps the second.
+
+So, let's say you want sc02 2026 for days 1-7.
+
+Set threedays to True (preferably in your json input), but if not in your command line.
+You don't want plots showing up every day and that used to be set as default to True. 
+But now the plot is created but not displayed as default.
+
+
+invsnr sc02 2026 1 ALL threedays T -doy3end 7 
+
+Then merge them
+
+invsnr_merge sc02 2026 
+
+The location will be printed to the screen.
+
+I did change the location of some outputs - so if you were a regular user of this code,
+pay attention.
+
+=============================================================================================
+
 Note: 
 
 - txt and csv output is now supported. 
