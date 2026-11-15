@@ -37,7 +37,7 @@ def parse_arguments():
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
-def download_tides(station: str, network : str, date1: str = None, date2: str = None, output: str = None, plt: bool = False, datum: str = 'mllw', subdir: str = None, year: int=None):
+def download_tides(station: str, network : str, date1: str = None, date2: str = None, output: str = None, plt: bool = False, datum: str = 'mllw', subdir: str = None, year: int=None, sensor: str = None):
     """
     Downloads tide gauge data from four different networks (see below)
 
@@ -107,10 +107,9 @@ def download_tides(station: str, network : str, date1: str = None, date2: str = 
 
     print(station, network, date1,date2,output,plt)
     if network == 'noaa':
-        datum = 'mllw'; subdir = None
         download_noaa.download_noaa(station, date1, date2, output, plt, datum, subdir)
     elif network == 'ioc':
-        outliers = False; sensor = None
+        outliers = False
         download_ioc.download_ioc(station, date1, date2, output, plt, outliers, sensor, subdir)
     elif network == 'wsv':
         download_wsv.download_wsv(station, plt, output)
