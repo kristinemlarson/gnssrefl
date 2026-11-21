@@ -19,6 +19,7 @@ import time
 import gnssrefl.gps as g
 import gnssrefl.refraction as refr
 from gnssrefl.gnss_frequencies import get_wavelength, get_glonass_wavelength, signal_label_to_freq
+from gnssrefl.gnss_frequencies import CONSTELLATIONS, CONSTELLATION_CHARS
 
 
 def make_wavelength_column(nr,snrdata,signal):
@@ -680,6 +681,105 @@ def residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,
     return res
 
 
+def setup_cubspl_js(knots, snrdt_arr, final_list):
+    """
+    precompute the data used by residuals_cubspl_js so the SNR fit can be
+    given an analytic jacobian.
+
+    The groups (and the observations within them) are in the same order as
+    residuals_cubspl_js. interp1d(kind='cubic') is the not-a-knot cubic
+    spline from make_interp_spline, which is linear in the knot values:
+    heights are local @ (coef @ knot values), where local is the sparse
+    B-spline basis (4 values per observation), evaluated once here.
+
+    Parameters
+    ----------
+    knots : numpy array
+        knot times (GPS seconds)
+    snrdt_arr : numpy array
+        detrended SNR observations, as returned by snr2arcs
+    final_list : list of str
+        constellation/frequency pairs, e.g. ['G1','G2']
+
+    Returns
+    -------
+    coef : numpy array
+        spline coefficients per unit knot value
+    groups : list of dictionaries
+        rows, basis, sine of elevation, wavelength and SNR for each pair
+    """
+    spl = interpolate.make_interp_spline(knots, np.eye(len(knots)), k=3)
+    sat = np.array(snrdt_arr[:, 1], dtype=float)
+    # satellite number offsets, e.g. G 0, R 100, E 200, C 300
+    offsets = {CONSTELLATION_CHARS[name]: info['offset'] for name, info in CONSTELLATIONS.items()}
+    groups = []
+    nobs = 0
+    for satc in final_list:
+        c = satc[0:1]
+        f = int(satc[1:2])
+        offset = offsets[c]
+        tfilter = np.logical_and(sat > offset, sat < offset + 100)
+        tmp_arr = snrdt_arr[tfilter, :]
+        tmp_arr = tmp_arr[tmp_arr[:, 4] == f, :]
+        lcar = satfreq2waveL(c, 'L' + str(f), tmp_arr[:, 1])
+        tgpst = np.array(tmp_arr[:, 0], dtype=float)
+        bf = np.logical_and(tgpst >= np.min(knots), tgpst <= np.max(knots))
+        if np.ndim(lcar) > 0:
+            lcar = lcar[bf]
+        n = int(np.sum(bf))
+        local = None
+        if n > 0:
+            local = interpolate.BSpline.design_matrix(tgpst[bf], spl.t, spl.k)
+        groups.append({'rows': slice(nobs, nobs + n), 'local': local,
+                       'sin_et': np.array(tmp_arr[bf, 2], dtype=float),
+                       'snr': np.array(tmp_arr[bf, 3], dtype=float),
+                       'lcar': lcar})
+        nobs = nobs + n
+    return spl.c, groups
+
+
+def cubspl_js_model(inparam, coef, groups, jacobian=False):
+    """
+    residuals (or their jacobian) of the SNR model used in
+    residuals_cubspl_js, using coef and groups from setup_cubspl_js.
+
+    inparam is the knot values, two amplitudes per group, then roughness.
+    """
+    nknots = coef.shape[1]
+    if len(inparam) != nknots + 2 * len(groups) + 1:
+        raise ValueError('expected knot values, two amplitudes per group and roughness')
+    spline_c = coef @ inparam[:nknots]
+    rough = inparam[-1]
+    nobs = groups[-1]['rows'].stop if groups else 0
+    if jacobian:
+        out = np.zeros((nobs, len(inparam)))
+    else:
+        out = np.empty(nobs)
+    for i, gr in enumerate(groups):
+        if gr['local'] is None:
+            continue
+        a = inparam[nknots + 2*i]
+        b = inparam[nknots + 2*i + 1]
+        s = gr['sin_et']
+        lk = 2 * np.pi / gr['lcar']
+        h = gr['local'] @ spline_c
+        phase = 2 * lk * h * s
+        sinp = np.sin(phase)
+        cosp = np.cos(phase)
+        dexp = -4 * lk ** 2 * s ** 2
+        damp = np.exp(dexp * rough)
+        model = (a * sinp + b * cosp) * damp
+        if jacobian:
+            jg = out[gr['rows']]
+            dh = (a * cosp - b * sinp) * damp * 2 * lk * s
+            np.multiply(gr['local'] @ coef, dh[:, None], out=jg[:, :nknots])
+            jg[:, nknots + 2*i] = sinp * damp
+            jg[:, nknots + 2*i + 1] = cosp * damp
+            jg[:, -1] = model * dexp
+        else:
+            out[gr['rows']] = model - gr['snr']
+    return out
+
 
 def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit=True, signal='L1', savefile=False, doplot=True, rough_in=0.1, **kwargs):
     """
@@ -975,11 +1075,14 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         aa,bb = snrdt_arr.shape
         #print('Dimensions of the snrdt_arr variable', aa,bb)
         #print('Now sending it ', Nfreq, ' different constellation specific frequencies')
+        # same model as residuals_cubspl_js, with an analytic jacobian
+        coef, groups = setup_cubspl_js(knots, snrdt_arr, final_list)
         def residuals_js_ls(inparam):
-            residuals = residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,Nfreq)
-            return residuals
+            return cubspl_js_model(inparam, coef, groups)
+        def jacobian_js_ls(inparam):
+            return cubspl_js_model(inparam, coef, groups, jacobian=True)
         #print('Calling the least squares code')
-        ls_js = least_squares(residuals_js_ls, kval_0, method='lm')
+        ls_js = least_squares(residuals_js_ls, kval_0, jac=jacobian_js_ls, method='lm')
         invout_js = ls_js.x
         kval_js = invout_js[:len(knots)]
         outparams_js = invout_js[len(knots):]
