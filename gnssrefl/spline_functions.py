@@ -308,6 +308,11 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     """
     #print('screen stats', screenstats)
     # get a list for late ron
+    if 'extension' in kwargs:
+        extension = kwargs.get('extension')
+    else:
+        extension = None
+
     if 'l2c_only' in kwargs:
         l2c_only = kwargs.get('l2c_only')
     # no need to print to screen
@@ -398,7 +403,10 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     # initialize values?
     kristine_dictionary(alld,'','')
 
-    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + str(year) + '/'
+    if extension is None:
+        xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + str(year) + '/'
+    else:
+        xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + str(year) + '/' + extension + '/'
     if not os.path.isdir(xdir):
         print('make output directory for files')
         subprocess.call(['mkdir','-p', xdir])
@@ -759,6 +767,10 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
     if 'rough_in' in kwargs:
         rough_in  = kwargs.get('rough_in')
+    if 'extension' in kwargs:
+        extension = kwargs.get('extension')
+    else:
+        extension = None
 
     risky = False
     if 'risky' in kwargs:
@@ -846,7 +858,10 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
     # set output directory here
     g.set_subdir(station)
-    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + str(year) + '/'
+    if extension is None:
+        xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + str(year) + '/'
+    else:
+        xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + str(year) + '/' + extension + '/'
 
 
     nr,nc = snrdata.shape
@@ -1100,7 +1115,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         ax.grid(True)
         ax.set_ylabel('RH meters')
         ax.invert_yaxis()
-        spng = str(os.environ['REFL_CODE']) + '/Files/' + station + '/invsnr/spline_out.png'
+        spng = str(os.environ['REFL_CODE']) + '/Files/' + station + '/invsnr/' + str(year) + '/spline_out.png'
         print('Plot with results has been written to ', spng)
         plt.savefig(spng)
         if doplot:

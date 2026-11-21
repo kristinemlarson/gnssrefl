@@ -18,7 +18,7 @@ def parse_arguments():
     parser.add_argument("year", default=None, type=int, help="year")
     parser.add_argument("doy", default=None, type=int, help="doy")
     parser.add_argument("signal", default=None, type=str, help="L1, L2, L5, L1+L2, L1+L2+L5, ALL ")
-
+    parser.add_argument("-extension", default=None, type=str, help="special processing strategy name")
     parser.add_argument("-peak2noise", default=None, type=float, help="Peak2noise ratio for Quality Control, default now 2.5")
     parser.add_argument("-constel", default=None, type=str, help="Only a single constellation (G,E, or R)")
     parser.add_argument("-screenstats", default=None, type=str, help="screen stats, False is default")
@@ -53,7 +53,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2.5, constel: str = None, 
+def invsnr(station: str, year: int, doy: int, signal: str, extension: str=None, peak2noise: float = 2.5, constel: str = None, 
         screenstats: bool = False, dec: int = 1, polydeg: int = 2, snrfit: bool = True, plt: bool = False,
         doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: float = 3, 
         rough_in: float = 0.1, risky: bool = False, snr: int = 66, 
@@ -83,6 +83,10 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
         would analyze day of year 15 and just L1 and L2, lower peak to noise limit ratio
     invsnr sc02 2023 15 L1+L2  -doy_end 18
         would analyze day of years 15 through 18 and L1 and L2 signals
+    invsnr sc02 2023 15 ALL -doy3end 20 
+        would do ALL frequencies with three day analyses for the days that are centered on 15 through 20,
+        ie. 14-15-16, 15-16,17, etc. You should use invsnr_merge to stitch these three
+        day series together.
 
     Parameters
     ----------
@@ -95,6 +99,8 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
     signal : str
         signal to use, L1  L2 L5 L6 L7 L1+L2 L1+L2+L5 L1+L5 or ALL
         I do not think L8 is allowed ... 
+    extension : str
+        name of processing strategy (as is used in gnssir)
     peak2noise: float, optional
         Peak2noise ratio limit for Quality Control.
         Default is 2.5
@@ -179,6 +185,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
 
     """
 
+    print('extension',extension)
     if len(station) != 4:
         print('Stations must be four characters long. Exiting.')
         sys.exit()
@@ -204,15 +211,29 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
 
     # location of the analysis inputs, if it exists
     jsondir  = xdir + '/input/'
+    # old
+    instructions1 =  jsondir + station + '/' + station + '.inv.json'
+
     instructions2 =  jsondir + station + '.inv.json'
+    ext = extension
+
+    if ext is not None:
+        instructions2 =  jsondir + station + '/inv/' + station + '.' + ext + '.json'
+        instructions1 = 'None'
 
     if json_override is False:
-        if os.path.isfile(instructions2):
-            #print('using:', instructions2)
-            with open(instructions2) as f:
+        if os.path.isfile(instructions1):
+            with open(instructions1) as f:
                 station_config = json.load(f)
+            print('Instruction file found here : ', instructions1) 
+        elif os.path.isfile(instructions2):
+                with open(instructions2) as f:
+                    station_config = json.load(f)
+                print('Instruction file found : ', instructions2)
         else:
-            print('Instruction file does not exist.', instructions2, ' Exiting.')
+            print('Could not find the json. Looked here: ')
+            print(instructions1)
+            print(instructions2)
             sys.exit()
     else:
         instructions2 = json_override
@@ -313,7 +334,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
                                         l2c_only=l2c_only, rough_in=rough_in, risky=risky, snr_ending=snr, 
                                         outfile_name=outfile, outfile_type=outfile_type, delta_out=delta_out, 
                                         station_config=station_config, outlier_limit=outlier_limit, no_dots=no_dots,
-                                        lastday_seconds=lastday_seconds,threedays=threedays)
+                                        lastday_seconds=lastday_seconds,threedays=threedays,extension=extension)
 
     else:
         spline_functions.snr2spline(station, year, doy, azilims, elvlims, rhlims, precision, kdt, signal=signal, 
@@ -322,7 +343,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
                                     l2c_only=l2c_only, rough_in=rough_in, risky=risky, snr_ending=snr, 
                                     outfile_name=outfile_name, outfile_type=outfile_type, delta_out=delta_out, 
                                     station_config=station_config, outlier_limit=outlier_limit, no_dots=no_dots,
-                                    lastday_seconds=lastday_seconds,threedays=threedays)
+                                    lastday_seconds=lastday_seconds,threedays=threedays,extension=extension)
     s2=time.time()
     print('Takes ', np.round(s2-s1,2), ' seconds')
     print('PAY ATTENTION: I moved where the outputs are written to. Check the screen output.')

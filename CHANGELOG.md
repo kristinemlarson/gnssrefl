@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 4.3.1
+
+adding an extension option to invsnr_input and invsnr.
+
 ## 4.3.0
 
 I've made some pretty big changes to invsnr. So documentation to follow.

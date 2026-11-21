@@ -35,6 +35,7 @@ def parse_arguments():
     parser.add_argument("-height", help="Ellipsoidal height (meters)", type=str, default=None)
     parser.add_argument("-knot_space", help="Knot spacing in hours ", type=float, default=3.0)
     parser.add_argument("-threedays", help="Doing a 3 day run", type=str, default=None)
+    parser.add_argument("-extension", help="special analysis strategy name", type=str, default=None)
 # these are the optional inputs 
     args = parser.parse_args().__dict__
 
@@ -44,7 +45,7 @@ def parse_arguments():
 
 def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=15, azim1: float = 0,
                  azim2: float = 360, lat: float = None, lon: float = None, height: float = None, 
-                 peak2noise: float=3, knot_space=3.0, threedays=False):
+                 peak2noise: float=3, knot_space=3.0, threedays=False, extension=None):
     """
     Sets some of the analysis parameters for invnsr. Values are stored in a json in $REFL_CODE/input
     Note: this code was written independently of gnssrefl. The Quality Control parametesr are thus quite 
@@ -88,6 +89,9 @@ def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=
     threedays : bool, optional
         whether you plan to use a three-day run
         i.e. the day before and after the one you really want.
+    extension : str, optional
+        whether you want to make a special analysis strategy file rather than
+        default
 
     """
 
@@ -143,17 +147,24 @@ def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=
         print('Exiting')
         sys.exit()
     xdir = os.environ['REFL_CODE']
-    outputdir  = xdir + '/input' 
+    outputdir  = xdir + '/input/'  + station + '/inv'
     if not os.path.isdir(outputdir):
-        subprocess.call(['mkdir', outputdir])
+        subprocess.call(['mkdir', '-p', outputdir])
+        print('made output directory')
+    print('All json files created for invsnr are now stored in :', outputdir)
 # 
     station_config['precision'] = 0.005 # precision of RH in meters
 # 
     station_config['l2c_only'] = True
 
+    #outputfile = outputdir + '/' + station + '.inv.json'
+    # default name 
     outputfile = outputdir + '/' + station + '.inv.json'
+    if extension is not None:
+        print('Using extension option')
+        outputfile = outputdir + '/' + station + '.' + extension + '.json'
+
     print('Writing json file to:', outputfile)
-    #print(lsp)
     with open(outputfile, 'w+') as outfile:
         json.dump(station_config, outfile, indent=4)
 
