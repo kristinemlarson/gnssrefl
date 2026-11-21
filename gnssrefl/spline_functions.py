@@ -378,6 +378,9 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     # kl added a column for frequency
     #snrdt_arr = np.empty((0, 4), dtype=object)
     snrdt_arr = np.empty((0, 5), dtype=object)
+    # collect arcs in lists and stack once at the end
+    rh_list = [rh_arr]
+    snrdt_list = [snrdt_arr]
     # get rid of satellite 51, 46 because not sure what it is
     # KL - not necessary - there are legal satellites > 32 in galileo
     #nobadsats = np.logical_or(snrdata[:, 0] < 33, snrdata[:, 0] > 99)
@@ -519,15 +522,18 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                     pktn = np.max(pgram_sub) / np.mean(pgram_sub)
 
 
-                    maxF, maxA,peak2noise = simpleLSP(rhlims, lcar, precision,
-                            elvt, sinelvt, snrdt,sat,xsignal,screenstats,fout,pktnlim)
+                    # simpleLSP only writes the screenstats lines to my_lsp.txt;
+                    # its results are not used, so skip it otherwise
+                    if screenstats:
+                        maxF, maxA,peak2noise = simpleLSP(rhlims, lcar, precision,
+                                elvt, sinelvt, snrdt,sat,xsignal,screenstats,fout,pktnlim)
 
 
                     #print('new', pktn, 'limit',pktnlim, 'old',np.max(pgram_sub) / np.mean(pgram))
                     if maxind != 0 and maxind != len(pgram_sub) - 1 and pktn > pktnlim:  # no peaks at either end of window
                         # KL moved this to a function/added a column to save frequency information
                         temp_arr = save_lsp_results(datet,maxind,reflh_sub,sat,elvt,azit,pgram_sub,snrdt,pktn,isignal)
-                        rh_arr = np.vstack((rh_arr, temp_arr))
+                        rh_list.append(temp_arr)
                         if normalize:
                             snrdt = snrdt * 100 / (np.max(np.abs(snrdt)))
                         satt = np.empty((len(datet)), dtype=int)
@@ -538,10 +544,12 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                         #temp_arr = np.column_stack([datet, satt, sinelvt, snrdt])
                         temp_arr2 = np.column_stack([datet, satt, sinelvt, snrdt, onecol])
                         # stack em
-                        snrdt_arr = np.vstack((snrdt_arr, temp_arr2))
+                        snrdt_list.append(temp_arr2)
                         # and plots moved to function to clean this up
                         aa = str( int( np.mean(azit)) )
                         arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,aa,xsignal)
+    rh_arr = np.vstack(rh_list)
+    snrdt_arr = np.vstack(snrdt_list)
     rh_arr = rh_arr[rh_arr[:, 0].argsort()]
     # make sure that arrays are sorted by time
     snrdt_arr = snrdt_arr[snrdt_arr[:, 0].argsort()]
