@@ -4216,7 +4216,10 @@ def big_Disk_in_DC_hourly(station, year, month, day,idtag):
     crinexfile = station + cdoy + idtag + '.' + cyy + 'o.gz'
     rinexfile =  station + cdoy + idtag + '.' + cyy + 'o'
     # do not know if this works - but what the hey
-    mainadd = 'https://geodesy.noaa.gov/corsdata/rinex/'
+    # NGS moved the public CORS archive to the NOAA Open Data Dissemination
+    # S3 bucket on 2026-11-01; the legacy geodesy.noaa.gov/corsdata/ paths
+    # now return 410 Gone (#449). Same rinex/YYYY/DDD/station/ layout.
+    mainadd = 'https://noaa-cors-pds.s3.amazonaws.com/rinex/'
     #mainadd = 'ftp://www.ngs.noaa.gov/cors/rinex/'
     url = mainadd + cyyyy + '/' + cdoy+ '/' + station + '/' + crinexfile
     print(url)
