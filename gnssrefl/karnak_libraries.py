@@ -555,7 +555,12 @@ def universal_rinex2(station, year, doy, archive,screenstats):
         yy,mm,dd = g.ydoy2ymd(year,doy)
         file_name, foundit = g.big_Disk_work_hard(station,yy,mm,dd,delete_hourly)
     elif (archive == 'ngs'):
-        dir1 = 'https://geodesy.noaa.gov/corsdata/rinex/' + cydoy + '/' + station + '/'
+        # NGS moved the public CORS archive to the NOAA Open Data Dissemination
+        # S3 bucket on 2026-11-01; the legacy geodesy.noaa.gov/corsdata/ paths
+        # now return 410 Gone (#449). Same rinex/YYYY/DDD/station/ layout.
+        # Note cydoy already ends with '/', so no extra slash here: S3 treats
+        # '//' as part of the key and would 404 (the old host normalized it).
+        dir1 = 'https://noaa-cors-pds.s3.amazonaws.com/rinex/' + cydoy + station + '/'
         file_name = oname + '.gz' ; url = dir1 + file_name
         print(url)
         foundit = g.replace_wget(url,file_name)
