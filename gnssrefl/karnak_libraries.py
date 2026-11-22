@@ -79,7 +79,7 @@ def swapRS(stream):
 def just_bkg(cyyyy, cdoy, file_name):
     """
 
-    looks for RINEX files at BKG in two directories
+    looks for RINEX files at BKG in three directories
 
     Parameters
     ----------
@@ -93,9 +93,10 @@ def just_bkg(cyyyy, cdoy, file_name):
         expected RINEX filename
 
     """
-    # BKG has two separate archives - 
+    # BKG has three separate archives -
     dir1 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cyyyy + '/' + cdoy + '/'
     dir2 = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cyyyy + '/' + cdoy + '/'
+    dir3 = 'https://igs.bkg.bund.de/root_ftp/BfGNet/obs/' + cyyyy + '/' + cdoy + '/'
     print('>>> Trying first : ',dir1+file_name)
     fexist = False
     try:
@@ -110,6 +111,12 @@ def just_bkg(cyyyy, cdoy, file_name):
             fexist = g.replace_wget(dir2+file_name, file_name)
             #wget.download(dir2+file_name,file_name)
             #fexist = True
+        except:
+            print('did not find it there either')
+    if (not fexist):
+        print('>>> Now trying: ',dir3+file_name)
+        try:
+            fexist = g.replace_wget(dir3+file_name, file_name)
         except:
             print('did not find it there either')
 
