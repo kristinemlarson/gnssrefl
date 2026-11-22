@@ -840,7 +840,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         startMergedFile = True 
         for d in range(doy, doy_end+1):
             # this does not go over the end of year ... or over beginning of year either..
-            snrfile, snrdir, stryear_temp, strdoy_temp,fileexist = define_inputfile(station,year,daybefore,snr_ending)
+            snrfile, snrdir, stryear_temp, strdoy_temp,fileexist = define_inputfile(station,year,d,snr_ending)
 
             if fileexist:
                 snrtemp = readklsnrtxt(snrfile, snrdir,signal)
