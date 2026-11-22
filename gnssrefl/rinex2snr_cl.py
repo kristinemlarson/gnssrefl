@@ -109,7 +109,7 @@ def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str =
     Default orbits are GPS only until day of year 137, 2021 when rapid GFZ orbits became available.  If you still want to use
     the nav message, i.e. GPS only, you can request it by setting orb to nav or gps.
 
-    bkg no longer a boolean input - it must be specified with archive name, i.e. bkg-igs or bkg-euref
+    bkg no longer a boolean input - it must be specified with archive name, i.e. bkg-igs, bkg-euref or bkg-bfg
 
     To analyze your own data you have to use the nolook option :
 
@@ -158,7 +158,7 @@ def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str =
         bev, bkg-euref, bkg-igs, cddis, epn, ga, gfz, nrcan, sonel, gnet, nz
 
     RINEX3 15 sec archives
-        bfg, unavco  - You likely need to specify a 15 second sample rate. bfg requires a password.
+        bfg, bkg-bfg, unavco  - You likely need to specify a 15 second sample rate. bfg requires a password.
         This archive has been turned off, 2025 Nov 28.
 
     RINEX3 1 sec 
@@ -309,6 +309,8 @@ def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str =
             bkg-igs : IGS data at the BKG (German Agency for Cartography and Geodesy)
 
             bkg-euref : EUREF data at the BKG (German Agency for Cartography and Geodesy)
+
+            bkg-bfg : BfGNet data at the BKG (German Agency for Cartography and Geodesy)
 
             cddis : (NASA's Archive of Space Geodesy Data)
 
@@ -657,10 +659,12 @@ def rinex2snr(station: str = None, year: int = None, doy: int = None, snr: str =
     if 'bkg' in archive:
         if (archive == 'bkg'):
             print('You have not specified which BKG archive you want.')
-            print('You must select bkg-igs or bkg-euref.')
+            print('You must select bkg-igs, bkg-euref or bkg-bfg.')
             sys.exit()
         if 'euref' in archive:
             bkg = 'EUREF'
+        elif 'bfg' in archive:
+            bkg = 'BfGNet'
         else:
             bkg = 'IGS'
         # change archive name back to original name
