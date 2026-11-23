@@ -15,8 +15,9 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", default=None, type=str)
     parser.add_argument("year", default=None, type=int, help="year")
-    parser.add_argument("-doy1", default=None, type=int, help="minimum day of year")
-    parser.add_argument("-doy2", default=None, type=int, help="maximum day of year")
+    parser.add_argument("-extension", default=None, type=str, help="analysis strategy name")
+    parser.add_argument("-doy1", default=None, type=int, help="optional minimum day of year")
+    parser.add_argument("-doy2", default=None, type=int, help="optional maximum day of year")
     parser.add_argument("-screen", default=None, type=str, help="stats")
 
     args = parser.parse_args().__dict__
@@ -27,19 +28,20 @@ def parse_arguments():
 
     return {key: value for key, value in args.items() if value is not None}
 
-def imerge(station: str, year: int, doy1: int=None, doy2: int=None, screen: bool=False):
+def imerge(station: str, year: int, extension: str=None, doy1: int=None, doy2: int=None, screen: bool=False):
     """
     Parameters
     ----------
     station : str
         4 character station name
-
     year : int
         full year
-
+    extension : str
+        analysis strategy name 
     doy1 : int
-
+        day of year, starting
     doy2 : int
+        day of year, ending
 
     """
     xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' 
@@ -50,10 +52,10 @@ def imerge(station: str, year: int, doy1: int=None, doy2: int=None, screen: bool
     if doy2 is None:
         doy2 = dec31
 
-    mjd, rh,all_lines = read_invfile(station,year,doy1,doy2,xdir)
+    mjd, rh,all_lines = read_invfile(station,year,extension, doy1,doy2,xdir)
 
 
-def read_invfile(station,year,doy1, doy2,xdirout):
+def read_invfile(station,year,extension, doy1, doy2,xdirout):
     """
     pick up output of invsnr.  assume it is three days
     long but only use the middle part
@@ -64,13 +66,20 @@ def read_invfile(station,year,doy1, doy2,xdirout):
     ----------
     year : int
         calendar year
+    extension : str
+        analysis strategy name
     doy1 : int
         first day of year
     doy2 : int
         last day of year
     """
     cyear = str(year)
-    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + cyear + '/'
+    if extension is None:
+        xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + cyear + '/'
+        outfile = xdirout + 'merge_' + station + '_' + cyear + '.txt'
+    else:
+        xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/invsnr/' + cyear + '/' + extension + '/'
+        outfile = xdirout + 'merge_' + station + '_' + extension + '_' + cyear + '.txt'
     allrh = []
     allmjd = []
     alll = []
@@ -100,7 +109,6 @@ def read_invfile(station,year,doy1, doy2,xdirout):
 
     # write to a file...in xdirout
 
-    outfile = xdirout + 'merge_' + station + '_' + cyear + '.txt'
     print('merged output goes to \n', outfile)
     head = getheader(station)
     fmt = '%4.0f %2.0f %2.0f %2.0f %2.0f %2.0f %8.3f %3.0f %13.6f %2.0f'
