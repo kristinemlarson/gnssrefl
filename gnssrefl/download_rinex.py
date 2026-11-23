@@ -52,7 +52,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     decimate does not seem to do anything, at least not for RINEX 2.11 files
 
-    bkg option is changed.  now must specify bkg-igs or bkg-euref
+    bkg option is changed.  now must specify bkg-igs, bkg-euref or bkg-bfg
 
     Examples
     --------
@@ -98,6 +98,8 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             bkg-igs : igs folder of BKG German Agency for Cartography and Geodesy
 
             bkg-euref : Euref folder of BKG German Agency for Cartography and Geodesy
+
+            bkg-bfg : BfGNet folder of BKG German Agency for Cartography and Geodesy
 
             bfg : German Agency for water research, only Rinex 3 (no longer works)
 
@@ -169,10 +171,12 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     if 'bkg' in archive:
         if (archive == 'bkg'):
             print('You have not specified which BKG archive you want.')
-            print('You must select bkg-igs or bkg-euref.')
+            print('You must select bkg-igs, bkg-euref or bkg-bfg.')
             sys.exit()
         if 'euref' in archive:
             bkg = 'EUREF'
+        elif 'bfg' in archive:
+            bkg = 'BfGNet'
         else:
             bkg = 'IGS'
         # change archive name back to original. This is ridiculously confusing
