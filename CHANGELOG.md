@@ -5,7 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 4.3.1
 
-adding an extension option to invsnr_input and invsnr.
+adding an extension option to invsnr_input, invsnr, and merge_invsnr.
+
+added [Townsend PR](https://github.com/kristinemlarson/gnssrefl/pull/448)  that improves speed to invsnr
+
+PR about [Beidou signals](https://github.com/kristinemlarson/gnssrefl/pull/444)
+
+removed morefunwithgps.com links.
+
 
 ## 4.3.0
 

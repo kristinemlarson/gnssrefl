@@ -24,7 +24,7 @@ def newchip_gfzrnx(exedir):
     else:
         print('Installing gfzrnx')
         localname = 'gfzrnx_osxarm64'
-        dfile = 'https://morefunwithgps.com/public_html/' + localname
+        dfile = 'https://kristinemlarson.github.io/gnssrefl/' + localname
         wget.download(dfile, savename)
         os.chmod(savename,0o777)
         if os.path.exists(savename):
@@ -156,7 +156,7 @@ def installexe(opsys: str):
 
     # where the executable files are (currently) stored publicly
 
-    sto = 'https://morefunwithgps.com/public_html/'
+    sto = 'https://kristinemlarson.github.io/gnssrefl/'
 
     if (opsys == 'linux64'):
         print('Only 64 bit static versions will be provided.')

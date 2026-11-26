@@ -552,7 +552,7 @@ def look_for_pickle_file():
             foundit = True
 
     if not foundit:
-        url= 'https://morefunwithgps.com/public_html/' + pfile
+        url= 'https://kristinemlarson.github.io/gnssrefl/' + pfile
         print('5th attempt - ',url)
         try:
             wget.download(url,fullpname)

@@ -6660,8 +6660,8 @@ def read_leapsecond_file(mjd):
         print(url)
         wget.download(url,xdir)
     if not os.path.isfile(xdir):
-        print('Trying to download leapsecond file from morefunwithgps')
-        url = 'https://morefunwithgps.com/public_html/leapseconds.txt'
+        print('Trying to download leapsecond file from github/kml')
+        url = 'https://kristinemlarson.github.io/gnssrefl/leapseconds.txt'
         print(url)
         wget.download(url,xdir)
     if not os.path.isfile(xdir):
