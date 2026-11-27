@@ -19,7 +19,8 @@ ls -l $REFL_CODE/input/gpt_1wA.pickle
 # smoke tests for invsnr and subdaily
 
 # use one file from my website instead of sopac
-wget https://morefunwithgps.com/public_html/sc021200.23o.gz
+#wget https://morefunwithgps.com/public_html/sc021200.23o.gz
+wget https://kristinemlarson.github.io/smoke/sc021200.23o.gz
 
 gunzip sc021200.23o.gz
 
@@ -40,7 +41,8 @@ invsnr sc02 2023 120 L1+L2+L5 -plt F
 
 
 # smoke test for nmea2snr
-wget https://morefunwithgps.com/public_html/BEUL0050.23.A.gz
+# now from my github account instead of morefunwithgps
+wget https://kristinemlarson.github.io/smoke/BEUL0050.23.A.gz
 mkdir $REFL_CODE/nmea
 mkdir $REFL_CODE/nmea/BEUL
 mkdir $REFL_CODE/nmea/BEUL/2023/
@@ -76,7 +78,7 @@ refl_zones p103 -azlist 90 180 270 360 -fr 2
 # case where station coordinates provided
 #gnssir_input xxxx  -lat 40 -lon -120 -height 10  -h1 5 -h2 20 -e1 5 -e2 15
 
-download_orbits nav 2010 1 10
+#download_orbits nav 2010 1 10
 download_orbits igs 2010 1 10
 #download_orbits gbm 2018 1 1
 
